@@ -4,7 +4,7 @@ const { REST } = require('@discordjs/rest');
 const { Routes, Client } = require('discord.js');
 const { TOKEN, GUILD_ID, CLIENT_ID } = require('./config.json');
 
-const clear_commands = true;
+const clear_commands = false;
 
 function getFiles(dir) {
     const files = fs.readdirSync(dir, {
