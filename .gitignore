@@ -1,0 +1,10 @@
+.vs*
+.idea
+
+.env
+
+node_modules
+*.tgz
+*.tar
+
+config.json
