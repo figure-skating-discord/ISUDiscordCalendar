@@ -2,16 +2,35 @@
   "name": "fsdiscordcalendar",
   "version": "1.0.0",
   "description": "A discord bot that automatically adds competitions posted by the ISU to your server event calendar",
-  "main": "index.js",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
+    "start": "node .",
+    "start:dev": "nodemon .",
+    "format": "prettier -c --write \"**/*.{cjs,mjs,js,json,ts}\"",
+    "lint": "eslint .",
+    "lint:fmt": "prettier --list-different \"**/*.{cjs,mjs,js,json,ts}\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./index.js",
-    "start:dev": "nodemon ./index.js"
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.11.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard-with-typescript": "^35.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "husky": "^8.0.3",
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.3"
   }
 }
