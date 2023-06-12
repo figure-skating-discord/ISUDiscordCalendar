@@ -1,17 +1,17 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js'
 
-module.exports = {
- data: new SlashCommandBuilder()
- .setName('echo')
+export default {
+  data: new SlashCommandBuilder()
+    .setName('echo')
     .setDescription('Repeats what the user says')
-    .addStringOption(option => 
-        option
-            .setName('text')
-            .setDescription('text to repeated')
-            .setRequired(true)
-    ),
+    .addStringOption((option) => {
+      return option
+        .setName('text')
+        .setDescription('text to repeated')
+        .setRequired(true)
+    }),
 
- async execute(interaction){
-    interaction.reply(`${interaction.options.getString('text')}`);
- }
+  async execute(interaction) {
+    interaction.reply(`${interaction.options.getString('text')}`)
+  },
 }
