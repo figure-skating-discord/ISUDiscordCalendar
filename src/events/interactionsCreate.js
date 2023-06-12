@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
-client.commands = getCommands('./commands');
+client.commands = getCommands(path.join(__dirname, '../commands'));
 
 module.exports = {
     name: 'interactionCreate',
@@ -26,13 +26,13 @@ function getCommands(dir) {
     const commandFiles = getFiles(dir);
 
     for(const commandFile of commandFiles) {
-        const command = require("."+commandFile)
+        const command = require(commandFile)
         commands.set(command.data.toJSON().name, command);
     }
     return commands;
 }
 
-function getFiles(dir){
+function getFiles(dir) {
     const files = fs.readdirSync(dir, {
         withFileTypes: true
     });

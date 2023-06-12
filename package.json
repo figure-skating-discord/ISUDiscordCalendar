@@ -2,7 +2,7 @@
   "name": "fsdiscordcalendar",
   "version": "1.0.0",
   "description": "A discord bot that automatically adds competitions posted by the ISU to your server event calendar",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "node .",
     "start:dev": "nodemon .",
