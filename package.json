@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "A discord bot that automatically adds competitions posted by the ISU to your server event calendar",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node .",
     "start:dev": "nodemon .",
+    "format": "prettier -c --write \"**/*.{cjs,mjs,js,json,ts}\"",
+    "format:check": "prettier --list-different \"**/*.{cjs,mjs,js,json,ts}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +18,7 @@
     "discord.js": "^14.11.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.8"
   }
 }
