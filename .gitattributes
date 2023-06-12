@@ -1,0 +1,12 @@
+* text=auto
+
+*.md   text diff=markdown
+*.txt  text
+
+*.yaml text
+*.json text
+
+*.cjs  text
+*.mjs  text
+*.js   text
+*.ts   text
