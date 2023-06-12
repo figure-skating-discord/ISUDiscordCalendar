@@ -1,6 +1,6 @@
 import { readdir } from 'fs'
 import { REST } from '@discordjs/rest'
-import { Routes, Client } from 'discord.js'
+import { Routes } from 'discord.js'
 import { TOKEN, GUILD_ID, CLIENT_ID } from './config.json'
 
 const getFiles = async (dir) => {
@@ -20,13 +20,13 @@ const getFiles = async (dir) => {
   return commandFiles
 }
 
-const clear_commands = false
+const clearCommands = false
 const commandFiles = getFiles('./commands')
 const commands = commandFiles.map(async (f) => (await import(f)).default)
 const rest = new REST({ version: '10' }).setToken(TOKEN)
 
-if (clear_commands) {
-  //Clearing Current Command Cache First
+if (clearCommands) {
+  // Clearing Current Command Cache First
   // for guild-based commands
   await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
     body: [],
@@ -36,7 +36,7 @@ if (clear_commands) {
   await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
   console.log('Successfully registered application commands')
 } else {
-  //Adding current commands to cache
+  // Adding current commands to cache
   await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
   console.log('Successfully registered application commands')
 }

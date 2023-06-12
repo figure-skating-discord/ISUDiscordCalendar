@@ -6,7 +6,7 @@ export default {
     .setDescription('sends an embed'),
 
   async execute(interaction) {
-    //these are not all the embed options see the api doc
+    // these are not all the embed options see the api doc
     const embed = new EmbedBuilder()
       .setTitle('Test Embed')
       .setDescription('Filler Text . . .')
@@ -31,9 +31,9 @@ export default {
 
     await interaction.reply({
       content: 'text reply',
-      //10 embed per reply limit
+      // 10 embed per reply limit
       embeds: [embed],
-      //ephemeral makes it so only command user sees reply
+      // ephemeral makes it so only command user sees reply
       ephemeral: true,
     })
   },

@@ -5,7 +5,7 @@ import path from 'path'
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 
 const getCommands = async (dir) => {
-  let commands = new Collection()
+  const commands = new Collection()
   const commandFiles = getFiles(dir)
 
   for (const commandFile of commandFiles) {
@@ -39,7 +39,7 @@ export default {
   async execute(interaction) {
     if (!interaction.isChatInputCommand()) return
 
-    let command = client.commands.get(interaction.commandName, false)
+    const command = client.commands.get(interaction.commandName, false)
 
     try {
       if (interaction.replied) return

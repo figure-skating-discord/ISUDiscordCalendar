@@ -1,7 +1,7 @@
 export default {
   name: 'guildMemberAdd',
   async execute(member) {
-    //set to true or remove if you want to welcome users
+    // set to true or remove if you want to welcome users
     const welcomeUser = false
     if (welcomeUser) {
       const welcomeRole = await member.guild.roles.cache.find(

@@ -14,7 +14,7 @@ export default {
     .addUserOption(
       (option) =>
         option.setName('link').setDescription('link to ISU competition page'),
-      //.setRequired(true)
+      // .setRequired(true)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false),
