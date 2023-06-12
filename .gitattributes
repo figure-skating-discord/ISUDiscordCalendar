@@ -1,12 +1,15 @@
 * text=auto
 
-*.md   text diff=markdown
-*.txt  text
+*.md        text diff=markdown
+*.txt       text
 
-*.yaml text
-*.json text
+*.yaml      text
+*.json      text
 
-*.cjs  text
-*.mjs  text
-*.js   text
-*.ts   text
+.husky/**/* text eol=lf
+*.sh        text eol=lf
+
+*.cjs       text
+*.mjs       text
+*.js        text
+*.ts        text
