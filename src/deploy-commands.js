@@ -9,7 +9,10 @@ const getFiles = async (dir) => {
 
   for (const file of files) {
     if (file.isDirectory()) {
-      commandFiles = [...commandFiles, ...(await getFiles(`${dir}/${file.name}`))]
+      commandFiles = [
+        ...commandFiles,
+        ...(await getFiles(`${dir}/${file.name}`)),
+      ]
     } else if (file.name.endsWith('.js')) {
       commandFiles.push(`${dir}/${file.name}`)
     }
@@ -25,7 +28,9 @@ const rest = new REST({ version: '10' }).setToken(TOKEN)
 if (clear_commands) {
   //Clearing Current Command Cache First
   // for guild-based commands
-  await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: [] })
+  await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+    body: [],
+  })
   // for global commands
   await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] })
   await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
