@@ -1,18 +1,15 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
+const submitTimeLimit = 1.08e+7;
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('add_event')
         .setDescription('Allows users to add a specific event via link to ISU page')
-        .addUserOption(option =>
-            option
-                .setName('link')
-                .setDescription('link to ISU competition page')
-            //.setRequired(true)
-        )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
 
+    /** @param {import('discord.js').Interaction} interaction  */
     async execute(interaction) {
         // Create the modal
         const modal = new ModalBuilder()
@@ -26,8 +23,8 @@ module.exports = {
             .setPlaceholder(`isu.org pages ONLY, sperate links with a new line.`)
             // Paragraph means multiple lines of text.
             .setStyle(TextInputStyle.Paragraph)
-            	 // require a value in this input field
-	        .setRequired(true);
+            // require a value in this input field
+            .setRequired(true);
 
         // An action row only holds one text input,
         // so you need one action row per text input.
@@ -38,5 +35,10 @@ module.exports = {
 
         // Show the modal to the user
         await interaction.showModal(modal);
-    }
+
+  /*       const filter = (interaction) => interaction.customId === 'addEventModal';
+        interaction.awaitModalSubmit({ filter, time: 1000 })
+            .then(interaction => console.log(`${interaction.customId} was submitted!`))
+            .catch(console.error); */
+    },
 }

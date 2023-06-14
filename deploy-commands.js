@@ -38,25 +38,23 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 if (clear_commands) {
     //Clearing Current Command Cache First
     // for guild-based commands
-    rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: [] })
-        .then(() => console.log('Successfully deleted all guild commands.'))
-        .catch(console.error);
-
+    /*  rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: [] })
+         .then(() => console.log('Successfully deleted all guild commands.'))
+         .catch(console.error);
+  */
     // for global commands
     rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] })
         .then(() => console.log('Successfully deleted all application commands.'))
-        .catch(console.error)
-        .then(() => {
+        .then(async () => {
             //Adding current commands to cache
-            rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
-                .then(() => { console.log('Successfully registered application commands') })
-                .catch(console.error);
-        });
+            await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
+            console.log('Successfully registered application commands');
+        })
+        .catch(console.error)
 } else {
-    
-//Adding current commands to cache
-rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
-    .then(() => { console.log('Successfully registered application commands') })
-    .catch(console.error);
 
+    //Adding current commands to cache
+    rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands })
+        .then(() => { console.log('Successfully registered application commands') })
+        .catch(console.error);
 }

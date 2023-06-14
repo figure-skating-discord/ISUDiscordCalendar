@@ -6,6 +6,6 @@ module.exports = {
                 .setDescription('Replies with "pong"'),
 
         async execute(interaction) {
-                interaction.reply("pong you're an admin");
+                interaction.reply("pong");
         }
 }
