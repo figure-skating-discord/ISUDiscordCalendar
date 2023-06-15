@@ -4,7 +4,10 @@ const path = require('node:path');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const { TOKEN } = require("../config.json")
+const { Scrapper } = require('../scrapper/scrapper.js')
 const { default_url, GP_URL } = require("../logosB64.json")
+
+console.log("scrapper module:", Scrapper)
 
 client.commands = getCommands('./commands');
 client.token = TOKEN;
@@ -43,19 +46,26 @@ async function handleModalSubmit(interaction) {
 
 
 async function addEventModal(interaction) {
+    const scrapper = new Scrapper
     const fieldInput = interaction.fields.getTextInputValue('linkInput');
-    const d = new Date()
-    const oneDay = 86400;
-    const eventStart = new Date('05 October 2023 14:48 UTC').toISOString();
-    const eventEnd = new Date('06 October 2023 14:48 UTC').toISOString();
-    const guild = interaction.guild;
-
-    await guild.scheduledEvents.create({name: fieldInput, scheduledStartTime: eventStart, scheduledEndTime: eventEnd, privacyLevel: 2, 
-                                        entityType: 3, description: "test desc", entityMetadata: { location: "discord" }, 
-                                        image: default_url}); 
+    if(!scrapper.checkValidURL(fieldInput)) {
+        await interaction.reply({ content: 'One or more of the links provided were not valid!' })
+    }
+    else {
+        console.log(fieldInput)
+        const d = new Date()
+        const oneDay = 86400;
+        const eventStart = new Date('05 October 2023 14:48 UTC').toISOString();
+        const eventEnd = new Date('06 October 2023 14:48 UTC').toISOString();
+        const guild = interaction.guild;
     
-
-    await interaction.reply({ content: 'Your submission was received successfully!' })
+        await guild.scheduledEvents.create({name: fieldInput, scheduledStartTime: eventStart, scheduledEndTime: eventEnd, privacyLevel: 2, 
+                                            entityType: 3, description: "test desc sdad", entityMetadata: { location: "discord" }, 
+                                            image: GP_URL}); 
+        
+    
+        await interaction.reply({ content: 'Your submission was received successfully!' })   
+    }
 }
 
 function getCommands(dir) {

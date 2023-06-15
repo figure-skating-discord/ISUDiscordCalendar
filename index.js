@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { TOKEN } = require("./config.json")
+const { Scrapper } = require('./scrapper/scrapper.js')
+console.log("scrapper", Scrapper)
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] | [GatewayIntentBits.GuildMembers] | [GatewayIntentBits.GuildMessages]});
 
@@ -20,4 +22,5 @@ for(const file of eventFiles){
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
+
 client.login(TOKEN);
