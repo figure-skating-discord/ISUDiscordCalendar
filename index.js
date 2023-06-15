@@ -3,8 +3,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { TOKEN } = require("./config.json")
-const { Scrapper } = require('./scrapper/scrapper.js')
-console.log("scrapper", Scrapper)
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] | [GatewayIntentBits.GuildMembers] | [GatewayIntentBits.GuildMessages]});
 

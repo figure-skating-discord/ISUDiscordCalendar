@@ -1,30 +1,50 @@
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom
 const axios = require('axios');
-const testURL = "https://www.isu.org/figure-skating/events/figure-skating-calendar/eventdetail/13635/-/isu-junior-grand-prix-of-figure-skating";
-const calendarURL = "https://www.isu.org/figure-skating/events/figure-skating-calendar";
 
-module.exports = class Scrapper {
+class Scrapper {
     constructor() {
 
     }
 
-    async scrapeCalendar() {
+    async scrapCalendar() {
 
     }
 
     async scrapeSingleEvent(url) {
         const pageHtml = await this.#getHTML(url);
-        const pageInfo = await this.#parsePage(pageHtml);
-
-        return pageInfo;
+        //console.log('pageHTML:', pageHtml)
+        if (pageHtml !== 'invalid link') {
+            const pageInfo = await this.#parsePage(pageHtml);
+            return pageInfo;
+        }
+        return undefined;
     }
 
     async #getHTML(url) {
-        const response = await fetch(url);
-        const htmlData = await response.text();
-        return htmlData;
+        console.log("url at the top:", url)
+        try {
+            const response = await fetch(url) 
+            //console.log("response:", response)
+            if (!response.ok) {
+                //console.log('res from res!ok', response)
+                //console.log('res not ok')
+                throw new Error('invalid request URL')
+            }
+            else {
+                console.log("res ok")
+                const htmlData = await response.text();
+                return htmlData;
+            }
+        }
+        catch (error) {
+            console.log('catch triggered')
+            console.log("catch err:", error)
+            console.log('url:', url)
+            return 'invalid link'
+        }
     }
+
     async #parsePage(pageHtml) {
         const dom = new JSDOM(pageHtml)
         const document = dom.window.document
@@ -36,7 +56,7 @@ module.exports = class Scrapper {
         const coverImgLink = `https:${imgInfo.src}`
         let imgB64 = undefined
 
-        if(imgInfo.height >= 320 && imgInfo.width >= 800 ) {
+        if (imgInfo.height >= 320 && imgInfo.width >= 800) {
             imgB64 = await this.#convertImageLinkToDataURL(coverImgLink)
         }
 
@@ -50,7 +70,7 @@ module.exports = class Scrapper {
             scheduledStartTime: new Date(dateArr[1]).toISOString(),
             scheduledEndTime: new Date(dateArr[2]).toISOString(),
         }
-        console.log(pageInfo);
+        //console.log(pageInfo);
         return pageInfo;
     }
 
@@ -58,10 +78,10 @@ module.exports = class Scrapper {
         const rx = /^([\w\s,]+)\s-\s([\w\s,]+)\s(\d{4})/;
         let arr = rx.exec(dateRangeString);
         //this adds the year onto the starting date when it is not already present
+        arr[2] += ` ${arr[3]}`;
         if (arr[1].length < arr[2].length) {
             arr[1] += `, ${arr[3]}`
         }
-        arr[2] += ` ${arr[3]}`;
         return arr;
     }
 
@@ -72,13 +92,16 @@ module.exports = class Scrapper {
             //console.log(`data:image/jpeg;base64,${base64}`)
             return `data:image/jpeg;base64,${base64}`;
             // Logs the base64 string
-          } catch (error) {
+        } catch (error) {
             console.error(error);
-          }
+        }
     }
     //checks if the url is from the ISU figure skating events
     checkValidURL(url) {
-        pattern = /isu.org\/figure-skating\/events\/figure-skating-calendar\/eventdetail\//
+        const pattern = /isu.org\/figure-skating\/events\/figure-skating-calendar\/eventdetail\//
         return pattern.test(url);
     }
 }
+
+module.exports = { Scrapper }
+

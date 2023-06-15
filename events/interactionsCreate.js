@@ -5,9 +5,8 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const { TOKEN } = require("../config.json")
 const { Scrapper } = require('../scrapper/scrapper.js')
-const { default_url, GP_URL } = require("../logosB64.json")
-
-console.log("scrapper module:", Scrapper)
+const { default_url, GP_URL } = require("../logosB64.json");
+const { url } = require('node:inspector');
 
 client.commands = getCommands('./commands');
 client.token = TOKEN;
@@ -36,7 +35,7 @@ async function handleModalSubmit(interaction) {
     switch (interaction.customId) {
         //modal response from the admin command "addEvent"
         case "addEventModal":
-            addEventModal(interaction);
+            addEventModals(interaction);
             break;
         default:
             interaction.reply({ content: 'default modal response' });
@@ -45,27 +44,52 @@ async function handleModalSubmit(interaction) {
 }
 
 
-async function addEventModal(interaction) {
+async function addEventModals(interaction) {
     const scrapper = new Scrapper
     const fieldInput = interaction.fields.getTextInputValue('linkInput');
-    if(!scrapper.checkValidURL(fieldInput)) {
-        await interaction.reply({ content: 'One or more of the links provided were not valid!' })
-    }
-    else {
-        console.log(fieldInput)
-        const d = new Date()
-        const oneDay = 86400;
-        const eventStart = new Date('05 October 2023 14:48 UTC').toISOString();
-        const eventEnd = new Date('06 October 2023 14:48 UTC').toISOString();
-        const guild = interaction.guild;
-    
-        await guild.scheduledEvents.create({name: fieldInput, scheduledStartTime: eventStart, scheduledEndTime: eventEnd, privacyLevel: 2, 
-                                            entityType: 3, description: "test desc sdad", entityMetadata: { location: "discord" }, 
-                                            image: GP_URL}); 
+    const linkArr = fieldInput.split('\n')
+    console.log("linkArr1:", linkArr)
+    await interaction.deferReply()
+    let passedLinks = []
+    let failedLinks = []
+    for (let i = 0; i < linkArr.length; i++) {
+        if(!scrapper.checkValidURL(linkArr[i])) {
+            failedLinks.push(linkArr[i])
+        }
+        else {
+            let pageInfo = await scrapper.scrapeSingleEvent(linkArr[i])
+            if (!pageInfo) {
+                failedLinks.push(linkArr[i])
+                continue;
+            }
+            else {
+                //console.log("pageInfo:", pageInfo)
+            const guild = interaction.guild;
+            await guild.scheduledEvents.create({name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime, scheduledEndTime: pageInfo.scheduledEndTime,
+                                                 privacyLevel: 2, entityType: 3, description: pageInfo.link, entityMetadata: { location: pageInfo.location }, 
+                                                image: pageInfo.coverImgB64}); 
+            
         
-    
-        await interaction.reply({ content: 'Your submission was received successfully!' })   
+            passedLinks.push(linkArr[i]);
+            }
+        }
     }
+    if (passedLinks.length != 0) {
+        reply = '**The following links were accepted:**'
+        followUp = '**The following provided links were invalid:**'
+        for (let i = 0; i < passedLinks.length; i++) {
+            reply += `\n${passedLinks[i]}`
+        }
+        await interaction.editReply({content: reply})
+        if (failedLinks.length != 0) {
+            for (let i = 0; i < failedLinks.length; i++) {
+                followUp += `\n${failedLinks[i]}`
+            }
+            await interaction.followUp({content: followUp})
+        }
+    }
+    else await interaction.editReply({content: "All of the provided links were not accepted!"})
+
 }
 
 function getCommands(dir) {
