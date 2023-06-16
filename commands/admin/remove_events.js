@@ -12,16 +12,27 @@ module.exports = {
 
         async execute(interaction) {
                 await interaction.deferReply()
-                let eventMap = await interaction.guild.scheduledEvents.fetch();
+                const eventManager = interaction.guild.scheduledEvents
+                let eventCollection = await eventManager.fetch();
+                let reply = '**The following Events are being removed:**';
                 //store the data in an array
-                //let eventArr = [...eventMap.keys()];
+                //;
                 let targetUser = await interaction.options.getUser('user')
                 if (targetUser) {
                     //console.log(eventMap)
-                    const [targetEvents, nonTargetEvents] = eventMap.partition(scheduledEvent => scheduledEvent.creator.id == targetUser.id)
+                    const [targetEvents, nonTargetEvents] = eventCollection.partition(scheduledEvent => scheduledEvent.creator.id == targetUser.id)
                     console.log(targetEvents);
+                    await targetEvents.forEach((event) => {
+                        reply += `\n${event.name}`
+                        event.delete()
+                    })
                 }
-                else console.log('no user specified')
-                await interaction.editReply({content: 'test remove'});
+                else {
+                    await eventCollection.forEach((event) => {
+                        reply += `\n${event.name}`
+                        event.delete()
+                    })
+                }
+                await interaction.editReply({content: `${reply}\n**If you are deleting a lot of events at once please allow the discord API a moment to process the delete requests.**`});
         }
 }

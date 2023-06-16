@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder} = require('disco
 
 module.exports = {
         data: new SlashCommandBuilder()
-                .setName('configure_events')
+                .setName('configure_auto_events')
                 .setDescription('Allows users to configure which events are posted by the bot')
                 .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
                 .setDMPermission(false),

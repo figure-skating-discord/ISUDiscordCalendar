@@ -4,7 +4,7 @@ const submitTimeLimit = 1.08e+7;
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('add_event')
+        .setName('add_events_by_link')
         .setDescription('Allows users to add a specific event via link to ISU page')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
@@ -14,7 +14,7 @@ module.exports = {
         // Create the modal
         const modal = new ModalBuilder()
             .setCustomId('addEventModal')
-            .setTitle('Add Event');
+            .setTitle('Add Event(s)');
 
         // Add components to modal
         const linkInput = new TextInputBuilder()

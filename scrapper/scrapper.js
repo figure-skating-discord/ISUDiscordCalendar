@@ -22,7 +22,7 @@ class Scrapper {
     }
 
     async #getHTML(url) {
-        console.log("url at the top:", url)
+        //console.log("url at the top:", url)
         try {
             const response = await fetch(url) 
             //console.log("response:", response)
@@ -32,13 +32,13 @@ class Scrapper {
                 throw new Error('invalid request URL')
             }
             else {
-                console.log("res ok")
+                //console.log("res ok")
                 const htmlData = await response.text();
                 return htmlData;
             }
         }
         catch (error) {
-            console.log('catch triggered')
+            //console.log('catch triggered')
             console.log("catch err:", error)
             console.log('url:', url)
             return 'invalid link'
@@ -67,8 +67,8 @@ class Scrapper {
             coverImgB64: imgB64,
             location: document.querySelector('.location').innerHTML.replace(' /', ', ').slice(1),
             locationLink: cover.querySelector('.info > .map').href,
-            scheduledStartTime: new Date(dateArr[1]).toISOString(),
-            scheduledEndTime: new Date(dateArr[2]).toISOString(),
+            scheduledStartTime: new Date(dateArr[1]),
+            scheduledEndTime: new Date(dateArr[2]),
         }
         //console.log(pageInfo);
         return pageInfo;
