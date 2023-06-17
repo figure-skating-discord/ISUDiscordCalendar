@@ -1,14 +1,59 @@
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom
 const axios = require('axios');
+const fs = require('node:fs');
 
 class Scrapper {
-    constructor() {
-
+    constructor(calendarLimit=0) {
+        const calendarURL = 'https://www.isu.org/figure-skating/events/figure-skating-calendar'
+        this.calendarLimit = calendarLimit
     }
 
-    async scrapCalendar() {
+    async scrapCalendar(calendarURL=this.calendarURL) {
+        const pageHtml = await this.getCalendarHTML(calendarURL);
+        if (pageHtml !== 'invalid link') {
+            const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
+            return eventLinkArr;
+        }
+        return undefined;
+    }
 
+    async getCalendarHTML(calendarURl) {
+        try {
+            
+            const response = await fetch("https://www.isu.org/figure-skating/events/figure-skating-calendar", {
+                "headers": {
+                  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                  "accept-language": "en-US,en;q=0.9,tr;q=0.8",
+                  "content-type": "application/x-www-form-urlencoded",
+                  "Referer": "https://www.isu.org/figure-skating/events/figure-skating-calendar",
+                  "Referrer-Policy": "strict-origin-when-cross-origin"
+                },
+                "body": `limit=${this.calendarLimit}&limitstart=0`,
+                "method": "POST"
+              });
+            //console.log("response:", response)
+            if (!response.ok) {
+                //console.log('res from res!ok', response)
+                //console.log('res not ok')
+                throw new Error('invalid request URL')
+            }
+            else {
+                //console.log("res ok")
+                const htmlData = await response.text();
+                console.log(htmlData)
+                fs.writeFile('testPage.html', htmlData, (err) => {
+                    if (err) throw err;
+                   });
+                return htmlData;
+            }
+        }
+        catch (error) {
+            //console.log('catch triggered')
+            console.log("catch err:", error)
+            console.log('url:', url)
+            return 'invalid link'
+        }
     }
 
     async scrapeSingleEvent(url) {
@@ -74,6 +119,15 @@ class Scrapper {
         return pageInfo;
     }
 
+    async #generateEventLinkArr(pageHtml) {
+        const dom = new JSDOM(pageHtml)
+        const document = dom.window.document
+
+        linkArr = []
+
+
+    }
+
     #extractStartAndEnd(dateRangeString) {
         const rx = /^([\w\s,]+)\s-\s([\w\s,]+)\s(\d{4})/;
         let arr = rx.exec(dateRangeString);
@@ -99,9 +153,18 @@ class Scrapper {
     //checks if the url is from the ISU figure skating events
     checkValidURL(url) {
         const pattern = /isu.org\/figure-skating\/events\/figure-skating-calendar\/eventdetail\//
-        return pattern.test(url);
+        if (pattern.test(url)) {
+            //console.log(`${url}\n^passed regex^`)
+            return true
+        }
+        else {
+            //console.log(`${url}\n^DID NOT passed regex^`)
+            return false;
+        }
     }
 }
+const scrapper = new Scrapper
 
-module.exports = { Scrapper }
-
+const html = scrapper.getCalendarHTML('https://www.isu.org/figure-skating/events/figure-skating-calendar')
+console.log(html);
+//module.exports = { Scrapper }
