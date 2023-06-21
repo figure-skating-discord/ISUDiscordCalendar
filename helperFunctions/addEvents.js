@@ -1,14 +1,17 @@
 const { Scrapper } = require('../scrapper/scrapper.js')
 
-async function addEvent(interaction, linkArr=undefined) {
+async function addEvents(interaction, linkArr=undefined) {
+
+    //await interaction.deferReply()
+    let numEventsProcessed = 0;
+
     const scrapper = new Scrapper
     if (!linkArr) {
         let fieldInput = interaction.fields.getTextInputValue('linkInput');
         linkArr = fieldInput.split('\n')
     }
-    //console.log("linkArr1:", linkArr)
 
-    await interaction.deferReply()
+    const progress = await interaction.followUp({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}`})
 
     let passedLinks = []
     let failedLinks = []
@@ -18,24 +21,19 @@ async function addEvent(interaction, linkArr=undefined) {
     let eventCollection = await eventManager.fetch();
 
     for (let i = 0; i < linkArr.length; i++) {
-        //console.log("link in for loop:",linkArr[i])
         let eventStarted = false;
         if (!scrapper.checkValidURL(linkArr[i])) {
             failedLinks.push(linkArr[i])
         }
         else {
             let pageInfo = await scrapper.scrapeSingleEvent(linkArr[i])
-            //console.log("pageInfo:", pageInfo)
             if (!pageInfo) {
                 failedLinks.push(linkArr[i])
                 continue;
             }
             else {
-                const currentDate = new Date();
-                //console.log("current date:", currentDate)
-                //console.log('event start time', pageInfo.scheduledStartTime)
+                const currentDate = new Date;
                 if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
-                    //console.log('event started already')
                     startedLinks.push(linkArr[i])
                     eventStarted = true;
                     continue;
@@ -51,7 +49,7 @@ async function addEvent(interaction, linkArr=undefined) {
                      if (existingEvent.image) */
 
                     await existingEvent.edit({
-                        scheduledStartTime: pageInfo.scheduledStartTime.toISOString(), scheduledEndTime: pageInfo.scheduledEndTime.toISOString(),
+                        scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
                         description: pageInfo.link, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
                     });
                     passedLinks.push(linkArr[i]);
@@ -59,7 +57,7 @@ async function addEvent(interaction, linkArr=undefined) {
                 else if (!eventStarted) {
                     const guild = interaction.guild;
                     await guild.scheduledEvents.create({
-                        name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toISOString(), scheduledEndTime: pageInfo.scheduledEndTime.toISOString(),
+                        name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
                         privacyLevel: 2, entityType: 3, description: pageInfo.link, entityMetadata: { location: pageInfo.location },
                         image: pageInfo.coverImgB64
                     });
@@ -67,44 +65,61 @@ async function addEvent(interaction, linkArr=undefined) {
                 }
             }
         }
+        numEventsProcessed++;
+        console.log(`Number of events processed: ${numEventsProcessed}/${linkArr.length}`);
+        progress.edit({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}`})
     }
     if (passedLinks.length != 0) {
-        let reply = '**The following links were accepted:**'
-        let failedLinkReply = '**The following provided links were invalid:**'
-        let startedLinkReply = '**The Following provided links are for events that have already started**'
+        let reply = ['**The following links were accepted:**']
+        let failedLinkReply = ['**The following provided links were invalid:**']
+        let startedLinkReply = ['**The Following provided links are for events that have already started**']
         for (let i = 0; i < passedLinks.length; i++) {
-            reply += `\n${passedLinks[i]}`
+            if (reply[-0].length + passedLinks[i] >= 2000) reply.push(passedLinks[i]);
+            else reply[-0] += `\n${passedLinks[i]}`
         }
-        await interaction.editReply({ content: reply })
+        await interaction.editReply({ content: reply[0], components: [], embeds: []})
+        if (reply[1]) {
+            for (let i = 1; i < reply.length; i++) {
+                await interaction.followUp({ content: reply[i] })
+            }
+        }
         if (failedLinks.length != 0) {
             for (let i = 0; i < failedLinks.length; i++) {
-                failedLinkReply += `\n${failedLinks[i]}`
+                if (failedLinkReply[-0].length + failedLinks[i] >= 2000) reply.push(failedLinks[i]);
+                else failedLinkReply[-0] += `\n${failedLinks[i]}`
             }
-            await interaction.followUp({ content: failedLinkReply })
+            failedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
         }
         if (startedLinks.length != 0) {
             for (let i = 0; i < startedLinks.length; i++) {
-                startedLinkReply += `\n${startedLinks[i]}`
+                if (startedLinkReply[-0].length + startedLinks[i] >= 2000) reply.push(startedLinks[i]);
+                else startedLinkReply[-0] += `\n${startedLinks[i]}`
             }
-            await interaction.followUp({ content: startedLinkReply })
+            startedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
         }
     }
     else if (startedLinks != 0) {
         let failedLinkReply = '**The following provided links were invalid:**'
         let startedLinkReply = '**The Following provided links are for events that have already started**'
         for (let i = 0; i < startedLinks.length; i++) {
-            startedLinkReply += `\n${startedLinks[i]}`
+            if (startedLinkReply[-0].length + startedLinks[i] >= 2000) reply.push(startedLinks[i]);
+            else startedLinkReply[-0] += `\n${startedLinks[i]}`
         }
-        await interaction.editReply({ content: startedLinkReply })
+        await interaction.editReply({ content: startedLinkReply[0], components: [], embeds: []})
+        if (startedLinkReply[1]) {
+            for (let i = 1; i < startedLinkReply.length; i++) {
+                await interaction.followUp({ content: startedLinkReply[i] })
+            }
+        }
         if (failedLinks.length != 0) {
             for (let i = 0; i < failedLinks.length; i++) {
-                failedLinkReply += `\n${failedLinks[i]}`
+                if (failedLinkReply[-0].length + failedLinks[i] >= 2000) reply.push(failedLinks[i]);
+                else failedLinkReply[-0] += `\n${failedLinks[i]}`
             }
-            await interaction.followUp({ content: failedLinkReply })
+            failedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
         }
     }
     else await interaction.followUp({ content: 'None of the provided links were valid' })
-
 }
 
-module.exports = { addEvent }
+module.exports = { addEvents }

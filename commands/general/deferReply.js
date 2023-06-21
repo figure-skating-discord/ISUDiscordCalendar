@@ -10,10 +10,11 @@ module.exports = {
             //normal reply only has 3 seconds to respond
             //deferReply has about 15 minutes
             await interaction.deferReply({ephemeral: true})
+            const temp = await interaction.followUp({content: "temp"})
             await wait(2000);
             await interaction.editReply({content: "Hello"})
-
-
+                temp.reply({content: "temp 2"})  
+        
             //await interaction.fetchReply({})
             await interaction.followUp({content: "Hello 2"})
         }

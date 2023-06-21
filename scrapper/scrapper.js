@@ -4,13 +4,14 @@ const axios = require('axios');
 const fs = require('node:fs');
 
 class Scrapper {
-    constructor(calendarLimit=0) {
-        const calendarURL = 'https://www.isu.org/figure-skating/events/figure-skating-calendar'
-        this.calendarLimit = calendarLimit
+    constructor(calendarLimit=0, calendarURL, calendarLimitStart=0) {
+        this.calendarURL = calendarURL;
+        this.calendarLimit = calendarLimit;
+        this.calendarLimitStart = calendarLimitStart;
     }
 
     async scrapCalendar(calendarURL=this.calendarURL) {
-        const pageHtml = await this.getCalendarHTML(calendarURL);
+        const pageHtml = await this.#getCalendarHTML(calendarURL);
         if (pageHtml !== 'invalid link') {
             const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
             return eventLinkArr;
@@ -18,18 +19,17 @@ class Scrapper {
         return undefined;
     }
 
-    async getCalendarHTML(calendarURl) {
+    async #getCalendarHTML(calendarURl) {
         try {
-            
-            const response = await fetch("https://www.isu.org/figure-skating/events/figure-skating-calendar", {
+            const response = await fetch(calendarURl, {
                 "headers": {
                   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                   "accept-language": "en-US,en;q=0.9,tr;q=0.8",
                   "content-type": "application/x-www-form-urlencoded",
-                  "Referer": "https://www.isu.org/figure-skating/events/figure-skating-calendar",
+                  "Referer": calendarURl,
                   "Referrer-Policy": "strict-origin-when-cross-origin"
                 },
-                "body": `limit=${this.calendarLimit}&limitstart=0`,
+                "body": `limit=${this.calendarLimit}&${this.calendarLimitStart}=0`,
                 "method": "POST"
               });
             //console.log("response:", response)
@@ -41,7 +41,7 @@ class Scrapper {
             else {
                 //console.log("res ok")
                 const htmlData = await response.text();
-                console.log(htmlData)
+                //console.log(htmlData)
                 fs.writeFile('testPage.html', htmlData, (err) => {
                     if (err) throw err;
                    });
@@ -51,7 +51,7 @@ class Scrapper {
         catch (error) {
             //console.log('catch triggered')
             console.log("catch err:", error)
-            console.log('url:', url)
+            console.log('url:', calendarURl)
             return 'invalid link'
         }
     }
@@ -105,6 +105,16 @@ class Scrapper {
             imgB64 = await this.#convertImageLinkToDataURL(coverImgLink)
         }
 
+        let startLocal = new Date(dateArr[1])
+        let endLocal = new Date(dateArr[2])
+
+        let startUTC = new Date(startLocal.getTime() + startLocal.getTimezoneOffset() * 60_000) 
+        let endUTC = new Date(endLocal.getTime() + endLocal.getTimezoneOffset() * 60_000) 
+        if (startUTC.getTime() === endUTC.getTime()) {
+            console.log('incrementing by a day:', endUTC.getDate())
+            endUTC = new Date(endUTC.getTime() + 1000*60*60*24);
+            console.log(endUTC);
+        }
 
         let pageInfo = {
             link: document.baseURI,
@@ -112,8 +122,8 @@ class Scrapper {
             coverImgB64: imgB64,
             location: document.querySelector('.location').innerHTML.replace(' /', ', ').slice(1),
             locationLink: cover.querySelector('.info > .map').href,
-            scheduledStartTime: new Date(dateArr[1]),
-            scheduledEndTime: new Date(dateArr[2]),
+            scheduledStartTime: startUTC,
+            scheduledEndTime: endUTC,
         }
         //console.log(pageInfo);
         return pageInfo;
@@ -123,9 +133,14 @@ class Scrapper {
         const dom = new JSDOM(pageHtml)
         const document = dom.window.document
 
-        linkArr = []
+        let linkArr = [];
 
+        const aNodes = document.querySelectorAll('.event_details > a')
 
+        aNodes.forEach((link) => {
+            if (link.href) linkArr.push(link.href);
+        })
+        return linkArr;
     }
 
     #extractStartAndEnd(dateRangeString) {
@@ -152,7 +167,7 @@ class Scrapper {
     }
     //checks if the url is from the ISU figure skating events
     checkValidURL(url) {
-        const pattern = /isu.org\/figure-skating\/events\/figure-skating-calendar\/eventdetail\//
+        const pattern = /^.+(isu\.org).+(\/events\/).+$/
         if (pattern.test(url)) {
             //console.log(`${url}\n^passed regex^`)
             return true
@@ -163,8 +178,8 @@ class Scrapper {
         }
     }
 }
-const scrapper = new Scrapper
+/* const scrapper = new Scrapper
 
 const html = scrapper.getCalendarHTML('https://www.isu.org/figure-skating/events/figure-skating-calendar')
-console.log(html);
-//module.exports = { Scrapper }
+console.log(html); */
+module.exports = { Scrapper }

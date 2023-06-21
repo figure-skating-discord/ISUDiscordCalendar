@@ -1,7 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
-const submitTimeLimit = 1.08e+7;
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('add_events_by_link')
@@ -13,7 +11,7 @@ module.exports = {
     async execute(interaction) {
         // Create the modal
         const modal = new ModalBuilder()
-            .setCustomId('addEventModal')
+            .setCustomId('addEventsModal')
             .setTitle('Add Event(s)');
 
         // Add components to modal
@@ -36,7 +34,7 @@ module.exports = {
         // Show the modal to the user
         await interaction.showModal(modal);
 
-  /*       const filter = (interaction) => interaction.customId === 'addEventModal';
+  /*       const filter = (interaction) => interaction.customId === 'addEventsModal';
         interaction.awaitModalSubmit({ filter, time: 1000 })
             .then(interaction => console.log(`${interaction.customId} was submitted!`))
             .catch(console.error); */

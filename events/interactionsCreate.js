@@ -4,10 +4,7 @@ const path = require('node:path');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const { TOKEN } = require("../config.json")
-const { Scrapper } = require('../scrapper/scrapper.js')
-const { default_url, GP_URL } = require("../logosB64.json");
-//const { url } = require('node:inspector');
-const { addEvent } = require('../helperFunctions/addEvent.js');
+const { addEvents } = require('../helperFunctions/addEvents.js');
 
 client.commands = getCommands('./commands');
 client.token = TOKEN;
@@ -34,9 +31,10 @@ module.exports = {
 
 async function handleModalSubmit(interaction) {
     switch (interaction.customId) {
-        //modal response from the admin command "addEvent"
-        case "addEventModal":
-            addEvent(interaction);
+        //modal response from the admin command "addEvents"
+        case "addEventsModal":
+            interaction.deferReply()
+            addEvents(interaction);
             break;
         default:
             interaction.reply({ content: 'default modal response' });
