@@ -1,4 +1,5 @@
 const { Scrapper } = require('../scrapper/scrapper.js')
+const { loadingBar } = require('./loadingBar.js');
 
 async function addEvents(interaction, linkArr=undefined) {
 
@@ -67,7 +68,8 @@ async function addEvents(interaction, linkArr=undefined) {
         }
         numEventsProcessed++;
         console.log(`Number of events processed: ${numEventsProcessed}/${linkArr.length}`);
-        progress.edit({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}`})
+        progress.edit({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}
+                    \n${loadingBar(numEventsProcessed, linkArr.length)}`})
     }
     if (passedLinks.length != 0) {
         let reply = ['**The following links were accepted:**']

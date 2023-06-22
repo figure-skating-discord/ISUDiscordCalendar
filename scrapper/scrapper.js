@@ -11,6 +11,7 @@ class Scrapper {
     }
 
     async scrapCalendar(calendarURL=this.calendarURL) {
+        console.log("calendar URL in scrap calendar", calendarURL)
         const pageHtml = await this.#getCalendarHTML(calendarURL);
         if (pageHtml !== 'invalid link') {
             const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
