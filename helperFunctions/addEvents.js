@@ -12,7 +12,7 @@ async function addEvents(interaction, linkArr=undefined) {
         linkArr = fieldInput.split('\n')
     }
 
-    const progress = await interaction.followUp({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}`})
+    const progress = await interaction.followUp({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}`})
 
     let passedLinks = []
     let failedLinks = []
@@ -68,8 +68,7 @@ async function addEvents(interaction, linkArr=undefined) {
         }
         numEventsProcessed++;
         console.log(`Number of events processed: ${numEventsProcessed}/${linkArr.length}`);
-        progress.edit({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}
-                    \n${loadingBar(numEventsProcessed, linkArr.length)}`})
+        progress.edit({content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}`})
     }
     if (passedLinks.length != 0) {
         let reply = ['**The following links were accepted:**']

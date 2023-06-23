@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, GuildScheduledEvent, Collection } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
+const { loadingBar } = require('../../helperFunctions/loadingBar.js')
 
 module.exports = {
         data: new SlashCommandBuilder()
@@ -43,7 +44,7 @@ module.exports = {
                         await targetEvents[i].delete()
                         eventNum++;
                         console.log(`Progess: ${eventNum}/${targetEvents.length}`)
-                        await progress.edit({content: `Progess: ${eventNum}/${targetEvents.length}`})
+                        await progress.edit({content: `Progess: ${eventNum}/${targetEvents.length}\n${loadingBar(eventNum, targetEvents.length)}`})
                     }
                 }
                 else {
@@ -63,13 +64,13 @@ module.exports = {
                         await interaction.followUp({content: reply[i]})
                     }
                     let eventNum = 0;
-                    let progress = await interaction.followUp({content: `Progess: ${eventNum}/${eventCollection.length}`}); 
+                    let progress = await interaction.followUp({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`}); 
                     //console.log("Progress:", progress)   
                     for (let i = 0; i < eventCollection.length; i++) {
                         await eventCollection[i].delete()
                         eventNum++;
                         console.log(`Progess: ${eventNum}/${eventCollection.length}`)
-                        await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}`})
+                        await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
                     }
                 }
             }
