@@ -11,7 +11,7 @@ class Scrapper {
     }
 
     async scrapCalendar(calendarURL=this.calendarURL) {
-        console.log("calendar URL in scrap calendar", calendarURL)
+        //console.log("calendar URL in scrap calendar", calendarURL)
         const pageHtml = await this.#getCalendarHTML(calendarURL);
         if (pageHtml !== 'invalid link') {
             const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
@@ -119,7 +119,7 @@ class Scrapper {
 
         let pageInfo = {
             link: document.baseURI,
-            name: cover.querySelectorAll('div > h3')[0].innerHTML,
+            name: cover.querySelectorAll('div > h3')[0].innerHTML.trim(),
             coverImgB64: imgB64,
             location: document.querySelector('.location').innerHTML.replace(' /', ', ').slice(1),
             locationLink: cover.querySelector('.info > .map').href,
@@ -177,6 +177,33 @@ class Scrapper {
             //console.log(`${url}\n^DID NOT passed regex^`)
             return false;
         }
+    }
+
+    #tableToObjArr(table){
+        const cats = table[0].cells
+        const levels = table[1].cells
+        const checkRow = table[2].cells
+        let arr = []
+    
+        for (let i = 0; i < cats.length; i++) {
+            let catTitle = cats[i].querySelector('p').innerHTML
+            let temp = {}
+            temp[catTitle] = {levels: ''}
+            for (let j = 0; j < cats[i].colSpan; j++) {
+                if(/.*x.*/.test(checkRow[( j + cats[i].colSpan*(i))].innerHTML)) {
+                    temp[catTitle].levels += `${levels[( j + cats[i].colSpan*(i))].querySelector('p').innerHTML}, `
+                }
+            }
+            //remove trailing comma and space
+            temp[catTitle].levels = temp[catTitle].levels.slice(0, -2);
+            arr.push(temp)
+        }
+        console.log(arr)
+        return arr
+    }
+
+    #getResultsLink(document){
+
     }
 }
 /* const scrapper = new Scrapper

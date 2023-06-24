@@ -33,7 +33,7 @@ async function handleModalSubmit(interaction) {
     switch (interaction.customId) {
         //modal response from the admin command "addEvents"
         case "addEventsModal":
-            interaction.deferReply()
+            await interaction.deferReply()
             addEvents(interaction);
             break;
         default:

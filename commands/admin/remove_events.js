@@ -72,6 +72,7 @@ module.exports = {
                         console.log(`Progess: ${eventNum}/${eventCollection.length}`)
                         await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
                     }
+                    await progress.edit({content: `Progess: Complete! (${eventNum}/${eventCollection.length})\n${loadingBar(eventNum, eventCollection.length)}`})
                 }
             }
 }
