@@ -112,9 +112,9 @@ class Scrapper {
         let startUTC = new Date(startLocal.getTime() + startLocal.getTimezoneOffset() * 60_000)
         let endUTC = new Date(endLocal.getTime() + endLocal.getTimezoneOffset() * 60_000)
         if (startUTC.getTime() === endUTC.getTime()) {
-            console.log('incrementing by a day:', endUTC.getDate())
+            //console.log('incrementing by a day:', endUTC.getDate())
             endUTC = new Date(endUTC.getTime() + 1000 * 60 * 60 * 24);
-            console.log(endUTC);
+            //console.log(endUTC);
         }
 
         let table = document.querySelector('table > tbody')

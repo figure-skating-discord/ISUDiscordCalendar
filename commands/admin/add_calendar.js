@@ -18,8 +18,7 @@ module.exports = {
             //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_2018.png')
             //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_footer.png')
             .setThumbnail('https://imgur.com/pnNlUrG.png')
-            .setDescription(`Click the button for the ISU calendar you\'d like to add the events from.
-                            Then specify how many events you\'d like to add with the drop down.`)
+            .setDescription(`Click the button for the ISU calendar you\'d like to add the events from. Then specify how many events you\'d like to add with the drop down.`)
             .addFields(
                 { name: '⛸️ Figure Skating', value: 'https://www.isu.org/figure-skating/events/figure-skating-calendar' },
                 { name: '🧑‍🤝‍🧑 Synchro', value: 'https://www.isu.org/synchronized-skating/events/synchronized-skating-calendar'},

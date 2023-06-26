@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, GuildScheduledEvent, Collection } = require('discord.js');
+const { SlashCommandBuilder, GuildScheduledEvent, Collection, PermissionFlagsBits} = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 const { loadingBar } = require('../../helperFunctions/loadingBar.js')
 
@@ -6,6 +6,7 @@ module.exports = {
         data: new SlashCommandBuilder()
                 .setName('remove_events')
                 .setDescription('removes_guild_scheduled_events')
+                .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
                 .addUserOption(option =>
                     option
                         .setName('user')

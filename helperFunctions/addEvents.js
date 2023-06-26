@@ -51,14 +51,14 @@ async function addEvents(interaction, linkArr = undefined) {
                                 const key = Object.keys(lvls[i])[0]
                                 if(lvls[i][key].levels) lvlsStr += `\n**\`${key}\`:** ${lvls[i][key].levels}`;
                             }
-                            //lvlsStr += '\n\n';
+                            lvlsStr += '\n';
                          }
-                         else lvlsStr = '\n'
+                         //else lvlsStr = '\n'
 
                     let resultStr = ''
 
                     if (pageInfo.results) resultStr = `\n**__Results Page__:**\n${pageInfo.results}\n\n`
-                    else resultStr = '\n'
+                    //else resultStr = '\n'
 
                     let existingEvent = await eventCollection.find(scheduledEvent => scheduledEvent.name === pageInfo.name)
                     if (existingEvent && existingEvent.creator.bot) {
@@ -92,9 +92,9 @@ async function addEvents(interaction, linkArr = undefined) {
             progress.edit({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` })
         }
         if (passedLinks.length != 0) {
-            let reply = ['**The following links were accepted:**']
+            let reply = ['**The following events were accepted:**']
             let failedLinkReply = ['**The following provided links were invalid:**']
-            let startedLinkReply = ['**The Following provided links are for events that have already started**']
+            let startedLinkReply = ['**The Following events have already started**']
             for (let i = 0; i < passedLinks.length; i++) {
                 if (reply.findLast(e => e == e).length + passedLinks[i].length >= 2000) reply.push(passedLinks[i]);
                 else reply[reply.length-1] += `\n${passedLinks[i]}`
