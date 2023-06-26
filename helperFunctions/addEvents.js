@@ -45,20 +45,17 @@ async function addEvents(interaction, linkArr = undefined) {
                     let lvlsStr = ''
 
                          if (pageInfo.levels) {
-                            lvlsStr = '\n**__Disciplines and Levels__:**'
+                            lvlsStr = '\n\n**__Disciplines and Levels__:**'
                             let lvls = pageInfo.levels
                             for(let i = 0; i < pageInfo.levels.length; i++) {
                                 const key = Object.keys(lvls[i])[0]
                                 if(lvls[i][key].levels) lvlsStr += `\n**\`${key}\`:** ${lvls[i][key].levels}`;
                             }
-                            lvlsStr += '\n';
                          }
-                         //else lvlsStr = '\n'
 
                     let resultStr = ''
 
-                    if (pageInfo.results) resultStr = `\n**__Results Page__:**\n${pageInfo.results}\n\n`
-                    //else resultStr = '\n'
+                    if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
 
                     let existingEvent = await eventCollection.find(scheduledEvent => scheduledEvent.name === pageInfo.name)
                     if (existingEvent && existingEvent.creator.bot) {
@@ -72,7 +69,7 @@ async function addEvents(interaction, linkArr = undefined) {
 
                         await existingEvent.edit({
                             scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
-                            description: `**CLICK EVENT FOR MORE INFO!**\n${lvlsStr}\n${resultStr}__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
+                            description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
                         });
                         passedLinks.push(linkArr[i]);
                     }
@@ -80,7 +77,7 @@ async function addEvents(interaction, linkArr = undefined) {
                         const guild = interaction.guild;
                         await guild.scheduledEvents.create({
                             name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
-                            privacyLevel: 2, entityType: 3, description: `**CLICK EVENT FOR MORE INFO!**\n${lvlsStr}\n${resultStr}__**ISU Competition Page:**__\n${pageInfo.link}`,
+                            privacyLevel: 2, entityType: 3, description: `**CLICK EVENT FOR MORE INFO!**\n${lvlsStr}${resultStr}__**ISU Competition Page:**__\n${pageInfo.link}`,
                             entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
                         });
                         passedLinks.push(linkArr[i]);
