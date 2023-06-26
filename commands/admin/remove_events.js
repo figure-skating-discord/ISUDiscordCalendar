@@ -43,7 +43,7 @@ module.exports = {
                     for (let i = 0; i < targetEvents.length; i++) {
                         await targetEvents[i].delete()
                         eventNum++;
-                        console.log(`Progess: ${eventNum}/${targetEvents.length}`)
+                        //console.log(`Progess: ${eventNum}/${targetEvents.length}`)
                         await progress.edit({content: `Progess: ${eventNum}/${targetEvents.length}\n${loadingBar(eventNum, targetEvents.length)}`})
                     }
                 }
@@ -69,7 +69,7 @@ module.exports = {
                     for (let i = 0; i < eventCollection.length; i++) {
                         await eventCollection[i].delete()
                         eventNum++;
-                        console.log(`Progess: ${eventNum}/${eventCollection.length}`)
+                        //console.log(`Progess: ${eventNum}/${eventCollection.length}`)
                         await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
                     }
                     await progress.edit({content: `Progess: Complete! (${eventNum}/${eventCollection.length})\n${loadingBar(eventNum, eventCollection.length)}`})

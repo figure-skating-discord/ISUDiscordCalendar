@@ -15,8 +15,9 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Calendar Select')
             .setURL('https://www.isu.org/events')
-            .setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_2018.png')
+            //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_2018.png')
             //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_footer.png')
+            .setThumbnail('https://imgur.com/pnNlUrG.png')
             .setDescription(`Click the button for the ISU calendar you\'d like to add the events from.
                             Then specify how many events you\'d like to add with the drop down.`)
             .addFields(
@@ -77,32 +78,7 @@ module.exports = {
                 new StringSelectMenuOptionBuilder()
 					.setLabel('All')
 					.setValue('0'),
-                ...menuOptions.map(i => new StringSelectMenuOptionBuilder().setLabel(i).setValue(i))
-				/* new StringSelectMenuOptionBuilder()
-					.setLabel('5')
-					.setValue('5'),
-				new StringSelectMenuOptionBuilder()
-					.setLabel('10')
-					.setValue('10'),
-				new StringSelectMenuOptionBuilder()
-					.setLabel('15')
-					.setValue('15'),
-                new StringSelectMenuOptionBuilder()
-					.setLabel('20')
-					.setValue('20'),
-                new StringSelectMenuOptionBuilder()
-					.setLabel('25')
-					.setValue('25'),
-                new StringSelectMenuOptionBuilder()
-					.setLabel('30')
-					.setValue('30'),
-                new StringSelectMenuOptionBuilder()
-					.setLabel('50')
-					.setValue('50'),
-                new StringSelectMenuOptionBuilder()
-					.setLabel('100')
-					.setValue('100') */
-			)
+                ...menuOptions.map(i => new StringSelectMenuOptionBuilder().setLabel(i).setValue(i)))
             .setDisabled(true);
 
         const menuRow = new ActionRowBuilder()
@@ -191,19 +167,19 @@ function enableSubmitButton() {
 function getCalendarURL(customIDSelection) {
     switch(customIDSelection) {
         case 'figureSkating':
-            console.log('figureSkating')
+            //console.log('figureSkating')
             return 'https://www.isu.org/figure-skating/events/figure-skating-calendar';
             break;
         case 'synchro':
-            console.log('synchro')
+            //console.log('synchro')
             return 'https://www.isu.org/synchronized-skating/events/synchronized-skating-calendar';
             break;
         case 'speedSkating':
-            console.log('speedSkating')
+            //console.log('speedSkating')
             return 'https://www.isu.org/speed-skating/events/speed-skating-calendar';
             break;
         case 'shortTrack':
-            console.log('shortTrack')
+            //console.log('shortTrack')
             return 'https://www.isu.org/short-track/events/short-track-calendar';
             break;
         default:

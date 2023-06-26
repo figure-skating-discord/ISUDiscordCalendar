@@ -1,0 +1,7 @@
+let table = document.querySelector('table > tbody')
+
+if (table) {
+    table = table.children;
+    tableToObjArr(table);
+}
+else console.log('no table found')

@@ -5,7 +5,7 @@ function loadingBar(current, max) {
         if (i < progress) progString += '▮';
         else progString += '▯';
     }
-    console.log('progress string:', progString)
+    //console.log('progress string:', progString)
     return progString;
 }
 

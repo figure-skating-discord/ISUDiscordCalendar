@@ -8,5 +8,4 @@ node_modules
 *.tar
 
 config.json
-test,js
-testPage.html
+test.js

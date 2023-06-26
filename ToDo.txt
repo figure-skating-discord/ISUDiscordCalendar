@@ -1,3 +1,3 @@
 - Add filters (extend menu options)
-- shortened urls
-- pull level of competition info
+- Shortened urls
+- Prevent users from using add and delete commands at the same time
