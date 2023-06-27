@@ -1,7 +1,6 @@
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom
 const axios = require('axios');
-const fs = require('node:fs');
 
 class Scrapper {
     constructor(calendarLimit = 0, calendarURL, calendarLimitStart = 0) {
@@ -43,9 +42,6 @@ class Scrapper {
                 //console.log("res ok")
                 const htmlData = await response.text();
                 //console.log(htmlData)
-                fs.writeFile('testPage.html', htmlData, (err) => {
-                    if (err) throw err;
-                });
                 return htmlData;
             }
         }

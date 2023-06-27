@@ -49,7 +49,7 @@ async function addEvents(interaction, linkArr = undefined) {
                             let lvls = pageInfo.levels
                             for(let i = 0; i < pageInfo.levels.length; i++) {
                                 const key = Object.keys(lvls[i])[0]
-                                if(lvls[i][key].levels) lvlsStr += `\n**\`${key}\`:** ${lvls[i][key].levels}`;
+                                if(lvls[i][key].levels) lvlsStr += `\n**${key}:** ${lvls[i][key].levels}`;
                             }
                          }
 
@@ -77,7 +77,7 @@ async function addEvents(interaction, linkArr = undefined) {
                         const guild = interaction.guild;
                         await guild.scheduledEvents.create({
                             name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
-                            privacyLevel: 2, entityType: 3, description: `**CLICK EVENT FOR MORE INFO!**\n${lvlsStr}${resultStr}__**ISU Competition Page:**__\n${pageInfo.link}`,
+                            privacyLevel: 2, entityType: 3, description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`,
                             entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
                         });
                         passedLinks.push(linkArr[i]);
