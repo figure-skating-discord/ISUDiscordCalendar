@@ -1,5 +1,5 @@
 # ISU Discord Calendar Usage
-All Events are pulled from event calendars located on the [ISU's website.](https://www.isu.org/)
+All Events are pulled from event calendars located on the [ISU's website](https://www.isu.org/). Additionally, all commands require admin permissions on the server they're being used on by default.
 
 ## Commands:
 <table >
@@ -20,7 +20,7 @@ All Events are pulled from event calendars located on the [ISU's website.](https
   </tr>
   <tr>
     <td>configure_auto_events</td>
-    <td>Does the same thing as `add_calendar` but also prompts the user to input a time interval for which the command will repeat, effectively updating events and adding new events when old events have passed. Multiple calendars can be set to automatically populate the server with                            events at once but the command must be ran for each calendar. However, if the same calendar is enabled more than once it will simply update the settings for that calendar. Settings will persist between bot restarts.&lt;br&gt;&lt;br&gt;&lt;ins&gt;In order to remove a calendar from the list of auto populating calendars the user must select the calendar via this command an then select "Disable Auto Events"&lt;/ins&gt;</td>
+    <td>Does the same thing as "add_calendar" command but also prompts the user to input a time interval for which the command will repeat, effectively updating events and adding new events when old events have passed. Multiple calendars can be set to automatically populate the server with events at once but the command must be ran for each calendar. However, if the same calendar is enabled more than once it will simply update the settings for that calendar. Settings will persist between bot restarts.<br><br><ins>In order to remove a calendar from the list of auto populating calendars the user must select the calendar via this command an then select "Disable Auto Events"</ins>.</td>
   </tr>
   <tr>
     <td>show_auto_config</td>
