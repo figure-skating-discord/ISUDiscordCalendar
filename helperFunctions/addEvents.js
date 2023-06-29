@@ -58,8 +58,10 @@ async function addEvents(interaction, linkArr = undefined) {
                     let resultStr = ''
 
                     if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
-
-                    let existingEvent = await eventCollection.find(scheduledEvent => scheduledEvent.name === pageInfo.name)
+                    let pageURLReg = new RegExp(`.*${pageInfo.link}.*`)
+                    let existingEvent = await eventCollection.find((scheduledEvent) => {
+                        return scheduledEvent.description.match(pageURLReg) //&& scheduledEvent.name === pageInfo.name
+                    })
                     if (existingEvent && existingEvent.creator.bot) {
                         /*The following checks if anything is different before making a api request
                          Image from page info will always be different in this case though :\ 
@@ -88,7 +90,7 @@ async function addEvents(interaction, linkArr = undefined) {
             }
             numEventsProcessed++;
             //console.log(`Number of events processed: ${numEventsProcessed}/${linkArr.length}`);
-            progress.edit({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` })
+            await progress.edit({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` })
         }
         if (passedLinks.length != 0) {
             let reply = ['**The following events were accepted:**']
