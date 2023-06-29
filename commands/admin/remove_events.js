@@ -7,6 +7,7 @@ module.exports = {
                 .setName('remove_events')
                 .setDescription('removes_guild_scheduled_events')
                 .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+                .setDMPermission(false)
                 .addUserOption(option =>
                     option
                         .setName('user')
@@ -73,7 +74,7 @@ module.exports = {
                         //console.log(`Progess: ${eventNum}/${eventCollection.length}`)
                         await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
                     }
-                    await progress.edit({content: `Progess: Complete! (${eventNum}/${eventCollection.length})\n${loadingBar(eventNum, eventCollection.length)}`})
+                    await progress.edit({content: `Progess: Complete! (${eventNum}/${eventCollection.length})`})
                 }
             }
 }

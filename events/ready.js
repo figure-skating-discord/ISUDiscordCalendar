@@ -22,7 +22,7 @@ module.exports = {
                     if (client.guilds.cache.find(guildId => guildId == settings.guildId)){
                         if (cals) {
                             for (let cal in cals) {
-                                console.log(client.guilds.cache)
+                                //console.log(client.guilds.cache)
                                 const guild = await client.guilds.fetch(settings.guildId)
                                 //console.log(cals[cal])
                                 startInterval(guild, cals[cal].numEvents, cals[cal].url, cal, cals[cal].interval*oneDay)
@@ -34,7 +34,6 @@ module.exports = {
                             if (err) {
                                 throw err;
                             }
-                        
                             console.log("Delete guild setting file for guild bot is no longer a part of");
                         });
                     }

@@ -12,7 +12,7 @@ const stopInterval = async (guild, calId) => {
     }
 }
 
-const startInterval = async (guild, calLimit, calUrl, calId, i = 1 * 60 * 1000) => {
+const startInterval = async (guild, calLimit, calUrl, calId, i = 1 * 60 * 60 * 1000) => {
     let intervalRef = setInterval(async () => {
         //console.log(calUrl)
         const scrapper = new Scrapper(calLimit, calUrl);

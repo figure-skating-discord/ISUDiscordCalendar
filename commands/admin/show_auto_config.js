@@ -4,7 +4,8 @@ const { getFiles } = require('../../helperFunctions/getFiles.js')
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('show_auto_config')
-		.setDescription('Shows the current settings for auto updating events in this server'),
+		.setDescription('Shows the current settings for auto updating events in this server')
+		.setDMPermission(false),
 
 	async execute(interaction) {
 		const files = getFiles(`${__dirname}/../../guildSettingsFiles`, 'json')

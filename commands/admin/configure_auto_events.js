@@ -272,7 +272,7 @@ async function toggleUpdateInverval(guild, calLimit, calUrl, calId, toggle = fal
             stopInterval(guild, calId)
 
             //convert the interval from hours to ms
-            let i = interval *60*60 *1000
+            let i = interval * 60 * 1000
             startInterval(guild, calLimit, calUrl, calId, i)
             //console.log(intervals)
         }
