@@ -9,3 +9,6 @@ node_modules
 
 config.json
 test.js
+
+guildSettingsFiles/*
+!guildSettingsFiles/example.json

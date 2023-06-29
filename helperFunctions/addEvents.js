@@ -7,13 +7,15 @@ async function addEvents(interaction, linkArr = undefined) {
         let numEventsProcessed = 0;
 
         const scrapper = new Scrapper
+
+        let progress;
         if (!linkArr) {
             let fieldInput = interaction.fields.getTextInputValue('linkInput');
-            linkArr = fieldInput.split('\n')
+            linkArr = fieldInput.split('\n');
+            //progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` });
         }
-        let progress;
-       if (linkArr.lenght != 0) {
-        progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` })
+       if (linkArr.length != 0) {
+            progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` });
        }
 
         let passedLinks = []

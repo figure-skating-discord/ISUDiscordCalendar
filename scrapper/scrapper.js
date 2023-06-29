@@ -9,9 +9,9 @@ class Scrapper {
         this.calendarLimitStart = calendarLimitStart;
     }
 
-    async scrapCalendar(calendarURL = this.calendarURL) {
-        //console.log("calendar URL in scrap calendar", calendarURL)
-        const pageHtml = await this.#getCalendarHTML(calendarURL);
+    async scrapCalendar() {
+        //console.log("calendar URL in scrap calendar", this.calendarURL)
+        const pageHtml = await this.#getCalendarHTML(this.calendarURL);
         if (pageHtml !== 'invalid link') {
             const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
             return eventLinkArr;

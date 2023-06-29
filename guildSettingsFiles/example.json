@@ -1,0 +1,14 @@
+{
+    "guildId": "1234xxx...",
+    "autoAddEvents": {
+        "calendars": {
+            "<calendar name>": {
+                "enabled": false,
+                "interval": "",
+                "url": "",
+                "numEvents": "",
+                "filters": ""
+            }
+        }
+    }
+}
