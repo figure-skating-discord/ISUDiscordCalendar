@@ -28,6 +28,7 @@ module.exports = {
                 //{ name: '😤 [All]()', value: 'Some value here'},
                 { name: "Please note, if you're adding a lot of events at once it can take a moment for Discord's API to update the event list.",
                 value: ' '},
+                { name: ' ', value: '*Developed by: <@109931759260430336>*'}
             )
             .setColor(0x454894);
 

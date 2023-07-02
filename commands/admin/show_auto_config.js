@@ -40,13 +40,14 @@ module.exports = {
 			.setTitle(`Auto Updating Event Settings For ${interaction.guild}`)
 			.setDescription('Current calendars being auto populated to this server:')
 			.setColor(0x454894)
-			.setTimestamp()
+			//.setTimestamp()
 			.addFields(
 				...(autoUpdateFields.length ? autoUpdateFields : [{
 					name: `None`,
 					value: ` `
 				}])
 			)
+			.addFields({ name: ' ', value: '*Developed by: <@109931759260430336>*'})
 		await interaction.reply({
 			embeds: [embed],
 
