@@ -11,6 +11,10 @@ All Events are pulled from event calendars located on the [ISU's website](https:
 </thead>
 <tbody valign="top">
   <tr>
+    <td>help</td>
+    <td>Responds with an embed listing each of the bot's commands and details on their usage and effects.</td>
+  </tr>
+  <tr>
     <td>add_events_by_link</td>
     <td>Creates a discord modal in which the user can paste links from an ISU event calendar page in order to add scheduled events to the current discord server. this interaction does not time out.</td>
   </tr>
