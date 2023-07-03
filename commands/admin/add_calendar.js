@@ -118,6 +118,7 @@ async function awaitSelection(response, interactionUserID, calendarSelection = u
         let comps = confirmation.message.components
         let calRow = comps[0].components
         let menuData = comps[1].components[0].data
+        //console.log('Menu Data:', menuData)
         let submitBtn = comps[2].components[0].data
         //console.log('confirmation:', confirmation)
         switch (confirmation.customId) {

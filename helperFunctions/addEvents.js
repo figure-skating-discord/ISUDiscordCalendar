@@ -58,7 +58,7 @@ async function addEvents(interaction, linkArr = undefined) {
                     let resultStr = ''
 
                     if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
-                    let pageURLReg = new RegExp(`.*${pageInfo.link}.*`)
+                    let pageURLReg = new RegExp(`.*${pageInfo.link.trim()}.*`)
                     let existingEvent = await eventCollection.find((scheduledEvent) => {
                         return scheduledEvent.description.match(pageURLReg) //&& scheduledEvent.name === pageInfo.name
                     })
