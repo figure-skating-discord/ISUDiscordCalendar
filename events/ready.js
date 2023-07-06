@@ -7,7 +7,8 @@ module.exports = {
     once: true,
     async execute(client) {
         console.log(`logged in as ${client.user.tag}`);
-        const oneDay = 60*60*1000
+        const oneHour = 60*60*1000
+        //const oneHour = 30*1000
         try {
 
             const files = getFiles(`${__dirname}/../guildSettingsFiles`, 'json')
@@ -25,7 +26,7 @@ module.exports = {
                                 //console.log(client.guilds.cache)
                                 const guild = await client.guilds.fetch(settings.guildId)
                                 //console.log(cals[cal])
-                                startInterval(guild, cals[cal].numEvents, cals[cal].url, cal, cals[cal].interval*oneDay)
+                                startInterval(guild, cals[cal].numEvents, cals[cal].url, cal, cals[cal].interval*oneHour)
                             }
                         }
                     }

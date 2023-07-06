@@ -2,13 +2,10 @@ const { Scrapper } = require('../scrapper/scrapper.js')
 const { loadingBar } = require('./loadingBar.js');
 
 async function addEvents(interaction, linkArr = undefined) {
+    let numEventsProcessed = 0;
+    let progress;
     try {
-        //await interaction.deferReply()
-        let numEventsProcessed = 0;
-
         const scrapper = new Scrapper
-
-        let progress;
         if (!linkArr) {
             let fieldInput = interaction.fields.getTextInputValue('linkInput');
             linkArr = fieldInput.split('\n');
@@ -144,7 +141,13 @@ async function addEvents(interaction, linkArr = undefined) {
         }
         else await interaction.followUp({ content: 'None of the provided links were valid' })
     } catch (error) {
-        console.log(error)
+        if (error.code == 30038) {
+            //console.log('DiscordAPIError[30038] Maximum number of uncompleted guild scheduled events reached (100)')
+            await progress.edit({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length} **(Canceled)**\n# Maximum Number of Server Events Reached!` })
+        }
+        else {
+            console.log(error)
+        }
     }
 }
 

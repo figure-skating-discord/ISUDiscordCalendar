@@ -69,7 +69,17 @@ async function autoAddEvents(guild, linkArr = undefined) {
             }
         }
     } catch (error) {
-        console.log(error)
+        //max guild scheduled events
+        if (error.code == 30038) {
+            //console.log('DiscordAPIError[30038] Maximum number of uncompleted guild scheduled events reached (100)')
+        }
+        //guild event not found (attempting to edit deleted event)
+        else if (error.code == 10070) {
+            //console.log('DiscordAPIError[10070]: Unknown Guild Scheduled Event')
+        }
+        else {
+            console.log(error)
+        }
     }
 }
 
