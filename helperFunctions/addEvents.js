@@ -119,8 +119,8 @@ async function addEvents(interaction, linkArr = undefined) {
             }
         }
         else if (startedLinks != 0) {
-            let failedLinkReply = '**Failed to retrieve the following links:**'
-            let startedLinkReply = '**The following events have already started:**'
+            let failedLinkReply = ['**Failed to retrieve the following links:**']
+            let startedLinkReply = ['**The following events have already started:**']
             for (let i = 0; i < startedLinks.length; i++) {
                 if (startedLinkReply.findLast(e => e == e).length + startedLinks[i].length >= 2000) reply.push(startedLinks[i]);
                 else startedLinkReply[startedLinkReply.length-1] += `\n${startedLinks[i]}`
