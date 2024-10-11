@@ -96,11 +96,7 @@ class Scrapper {
         let dateArr = this.#extractStartAndEnd(combinedEventDate);
         const imgInfo = document.querySelector('.jev_image1').dataset
         const coverImgLink = `https:${imgInfo.src}`
-        let imgB64 = undefined
-
-        if (imgInfo.height >= 320 && imgInfo.width >= 800) {
-            imgB64 = await this.#convertImageLinkToDataURL(coverImgLink)
-        }
+        let imgB64 = await this.#convertImageLinkToDataURL(coverImgLink);
 
         let startLocal = new Date(dateArr[1])
         let endLocal = new Date(dateArr[2])
@@ -114,6 +110,11 @@ class Scrapper {
         }
 
         let table = document.querySelector('table > tbody')
+        const cancelElement = document.querySelector('.item.table-responsive span[style*="color: #ff0000;"]');
+        if (cancelElement && cancelElement.textContent.includes('CANCELLED')) {
+            console.log('The event has been canceled.');
+        }
+
 
         let pageInfo = {
             link: document.baseURI,
@@ -144,6 +145,8 @@ class Scrapper {
         return linkArr;
     }
 
+    
+
     #extractStartAndEnd(dateRangeString) {
         const rx = /^([\w\s,]+)\s-\s([\w\s,]+)\s(\d{4})/;
         let arr = rx.exec(dateRangeString);
@@ -155,20 +158,24 @@ class Scrapper {
         return arr;
     }
 
-    async #convertImageLinkToDataURL(imageUrl, white) {
+    async #convertImageLinkToDataURL(imageUrl) {
         try {
             const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-            const base64 = Buffer.from(response.data, 'binary').toString('base64');
-            //console.log(`data:image/jpeg;base64,${base64}`)
-            if (white) {
-                let decode = atob(base64)
+            
+            // Determine image type from the response headers
+            const contentType = response.headers['content-type'];
+            if (!contentType.startsWith('image/')) {
+                throw new Error('The URL does not point to an image.');
             }
-            return `data:image/jpeg;base64,${base64}`;
-            // Logs the base64 string
+            
+            const base64 = Buffer.from(response.data, 'binary').toString('base64');
+            return `data:${contentType};base64,${base64}`;
         } catch (error) {
             console.error(error);
         }
     }
+    
+    
     //checks if the url is from the ISU figure skating events
     checkValidURL(url) {
         const pattern = /^.+(isu\.org).+(\/events\/).+$/
