@@ -102,7 +102,7 @@ async function addEvents(interaction, linkArr = undefined) {
             let reply = ['**The following events were accepted:**']
             let failedLinkReply = ['**Failed to retrieve the following links:**']
             let startedLinkReply = ['**The Following events have already started**']
-            let canceledLinkReply = ['**The following Events have been canceled:**']
+            let canceledLinkReply = ['**The following events have been canceled:**']
             for (let i = 0; i < passedLinks.length; i++) {
                 if (reply.findLast(e => e == e).length + passedLinks[i].length >= 2000) reply.push(passedLinks[i]);
                 else reply[reply.length-1] += `\n${passedLinks[i]}`
@@ -138,7 +138,7 @@ async function addEvents(interaction, linkArr = undefined) {
         else if (startedLinks.length != 0 || canceledLinks.length != 0) {
             let failedLinkReply = ['**Failed to retrieve the following links:**']
             let startedLinkReply = ['**The following events have already started:**']
-            let canceledLinkReply = ['**The following Events have been canceled:**']
+            let canceledLinkReply = ['**The following events have been canceled:**']
             for (let i = 0; i < startedLinks.length; i++) {
                 if (startedLinkReply.findLast(e => e == e).length + startedLinks[i].length >= 2000) reply.push(startedLinks[i]);
                 else startedLinkReply[startedLinkReply.length-1] += `\n${startedLinks[i]}`
