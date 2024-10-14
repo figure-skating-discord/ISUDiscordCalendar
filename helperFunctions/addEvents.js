@@ -17,6 +17,7 @@ async function addEvents(interaction, linkArr = undefined) {
 
         let passedLinks = []
         let failedLinks = []
+        let canceledLinks = []
         let startedLinks = []
 
         const eventManager = interaction.guild.scheduledEvents
@@ -34,27 +35,28 @@ async function addEvents(interaction, linkArr = undefined) {
                     continue;
                 }
                 else {
-                    const currentDate = new Date;
-                    if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
-                        startedLinks.push(linkArr[i])
-                        eventStarted = true;
-                        continue;
-                    }
-
                     let lvlsStr = ''
+                    let resultStr = ''
+                    if (!pageInfo.canceled) {
+                        const currentDate = new Date;
+                        if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
+                            startedLinks.push(linkArr[i])
+                            eventStarted = true;
+                            continue;
+                        }
 
-                         if (pageInfo.levels) {
+                        if (pageInfo.levels) {
                             lvlsStr = '\n\n**__Disciplines and Levels__:**'
                             let lvls = pageInfo.levels
                             for(let i = 0; i < pageInfo.levels.length; i++) {
                                 const key = Object.keys(lvls[i])[0]
                                 if(lvls[i][key].levels) lvlsStr += `\n**${key}:** ${lvls[i][key].levels}`;
                             }
-                         }
+                        }
+    
+                        if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
+                    }
 
-                    let resultStr = ''
-
-                    if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
                     let pageURLReg = new RegExp(`.*${pageInfo.link.trim()}.*`)
                     let existingEvent = await eventCollection.find((scheduledEvent) => {
                         return scheduledEvent.description.match(pageURLReg) //&& scheduledEvent.name === pageInfo.name
@@ -68,12 +70,19 @@ async function addEvents(interaction, linkArr = undefined) {
                          if (existingEvent.entityMetadata.location !== pageInfo.location) editArgObj[entityMetadata] = { location: pageInfo.location }
                          if (existingEvent.image) */
 
-                        await existingEvent.edit({
-                            scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
-                            description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
-                        });
-                        passedLinks.push(linkArr[i]);
+                        if (pageInfo.canceled) {
+                            existingEvent.delete()
+                            canceledLinks.push(linkArr[i])
+                        }
+                        else {
+                            await existingEvent.edit({
+                                scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
+                                description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
+                            });
+                            passedLinks.push(linkArr[i]);
+                        }
                     }
+                    else if (pageInfo.canceled) canceledLinks.push(linkArr[i])
                     else if (!eventStarted) {
                         const guild = interaction.guild;
                         await guild.scheduledEvents.create({
@@ -93,6 +102,7 @@ async function addEvents(interaction, linkArr = undefined) {
             let reply = ['**The following events were accepted:**']
             let failedLinkReply = ['**Failed to retrieve the following links:**']
             let startedLinkReply = ['**The Following events have already started**']
+            let canceledLinkReply = ['**The following Events have been canceled:**']
             for (let i = 0; i < passedLinks.length; i++) {
                 if (reply.findLast(e => e == e).length + passedLinks[i].length >= 2000) reply.push(passedLinks[i]);
                 else reply[reply.length-1] += `\n${passedLinks[i]}`
@@ -117,18 +127,40 @@ async function addEvents(interaction, linkArr = undefined) {
                 }
                 startedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
+            if (canceledLinks.length != 0) {
+                for (let i = 0; i < canceledLinks.length; i++) {
+                    if (canceledLinkReply.findLast(e => e == e).length + canceledLinks[i].length >= 2000) reply.push(canceledLinks[i]);
+                    else canceledLinkReply[canceledLinkReply.length-1] += `\n${canceledLinks[i]}`
+                }
+                canceledLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
+            }
         }
-        else if (startedLinks != 0) {
+        else if (startedLinks.length != 0 || canceledLinks.length != 0) {
             let failedLinkReply = ['**Failed to retrieve the following links:**']
             let startedLinkReply = ['**The following events have already started:**']
+            let canceledLinkReply = ['**The following Events have been canceled:**']
             for (let i = 0; i < startedLinks.length; i++) {
                 if (startedLinkReply.findLast(e => e == e).length + startedLinks[i].length >= 2000) reply.push(startedLinks[i]);
                 else startedLinkReply[startedLinkReply.length-1] += `\n${startedLinks[i]}`
             }
-            await interaction.editReply({ content: startedLinkReply[0], components: [], embeds: [] })
+            for (let i = 0; i < canceledLinks.length; i++) {
+                if (canceledLinks.findLast(e => e == e).length + canceledLinks[i].length >= 2000) reply.push(canceledLinks[i]);
+                else canceledLinkReply[canceledLinkReply.length-1] += `\n${canceledLinks[i]}`
+            }
+            if (startedLinks.length != 0) {
+                await interaction.editReply({ content: startedLinkReply[0], components: [], embeds: [] })
+            }
+            else if (canceledLinks.length != 0) {
+                await interaction.editReply({ content: canceledLinkReply[0], components: [], embeds: [] })
+            }
             if (startedLinkReply[1]) {
                 for (let i = 1; i < startedLinkReply.length; i++) {
                     await interaction.followUp({ content: startedLinkReply[i] })
+                }
+            }
+            if (canceledLinkReply[1]) {
+                for (let i = 1; i < canceledLinkReply.length; i++) {
+                    await interaction.followUp({ content: canceledLinkReply[i] })
                 }
             }
             if (failedLinks.length != 0) {
@@ -138,6 +170,9 @@ async function addEvents(interaction, linkArr = undefined) {
                 }
                 failedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
+        }
+        else if (canceledLinks != 0) {
+            // TODO: Add removal of canceled events.
         }
         else await interaction.followUp({ content: 'None of the provided links were valid' })
     } catch (error) {

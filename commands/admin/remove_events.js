@@ -40,13 +40,13 @@ module.exports = {
                         await interaction.followUp({content: reply[i]})
                     }
                     let eventNum = 0;
-                    let progress = await interaction.followUp({content: `Progess: ${eventNum}/${targetEvents.length}`}); 
+                    let progress = await interaction.followUp({content: `Progress: ${eventNum}/${targetEvents.length}`}); 
                     //console.log("Progress:", progress)   
                     for (let i = 0; i < targetEvents.length; i++) {
                         await targetEvents[i].delete()
                         eventNum++;
-                        //console.log(`Progess: ${eventNum}/${targetEvents.length}`)
-                        await progress.edit({content: `Progess: ${eventNum}/${targetEvents.length}\n${loadingBar(eventNum, targetEvents.length)}`})
+                        //console.log(`Progress: ${eventNum}/${targetEvents.length}`)
+                        await progress.edit({content: `Progress: ${eventNum}/${targetEvents.length}\n${loadingBar(eventNum, targetEvents.length)}`})
                     }
                 }
                 else {
@@ -66,15 +66,15 @@ module.exports = {
                         await interaction.followUp({content: reply[i]})
                     }
                     let eventNum = 0;
-                    let progress = await interaction.followUp({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`}); 
+                    let progress = await interaction.followUp({content: `Progress: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`}); 
                     //console.log("Progress:", progress)   
                     for (let i = 0; i < eventCollection.length; i++) {
                         await eventCollection[i].delete()
                         eventNum++;
-                        //console.log(`Progess: ${eventNum}/${eventCollection.length}`)
-                        await progress.edit({content: `Progess: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
+                        //console.log(`Progress: ${eventNum}/${eventCollection.length}`)
+                        await progress.edit({content: `Progress: ${eventNum}/${eventCollection.length}\n${loadingBar(eventNum, eventCollection.length)}`})
                     }
-                    await progress.edit({content: `Progess: Complete! (${eventNum}/${eventCollection.length})`})
+                    await progress.edit({content: `Progress: Complete! (${eventNum}/${eventCollection.length})`})
                 }
             }
 }

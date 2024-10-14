@@ -110,9 +110,10 @@ class Scrapper {
         }
 
         let table = document.querySelector('table > tbody')
+        let canceled = false
         const cancelElement = document.querySelector('.item.table-responsive span[style*="color: #ff0000;"]');
         if (cancelElement && cancelElement.textContent.includes('CANCELLED')) {
-            console.log('The event has been canceled.');
+            canceled = true
         }
 
 
@@ -125,7 +126,8 @@ class Scrapper {
             scheduledStartTime: startUTC,
             scheduledEndTime: endUTC,
             levels: table ? this.#tableToObjArr(table.children) : undefined,
-            results: this.#getResultsLink(document)
+            results: this.#getResultsLink(document),
+            canceled: canceled
         }
         //console.log(pageInfo);
         return pageInfo;

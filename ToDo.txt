@@ -1,3 +1,4 @@
+- Still update events that have already started but not ended
 - Add filters (extend menu options)
 - Shortened urls
 - Prevent users from using add and delete commands at the same time
