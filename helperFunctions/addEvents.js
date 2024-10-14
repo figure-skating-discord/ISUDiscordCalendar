@@ -25,6 +25,7 @@ async function addEvents(interaction, linkArr = undefined) {
 
         for (let i = 0; i < linkArr.length; i++) {
             let eventStarted = false;
+            let eventEnded = false;
             if (!scrapper.checkValidURL(linkArr[i])) {
                 failedLinks.push(linkArr[i])
             }
@@ -35,6 +36,9 @@ async function addEvents(interaction, linkArr = undefined) {
                     continue;
                 }
                 else {
+                    //DEV Line
+                    pageInfo.scheduledStartTime = new Date("2024-10-09T14:00:00.000Z")
+                    console.log(pageInfo.scheduledStartTime)
                     let lvlsStr = ''
                     let resultStr = ''
                     if (!pageInfo.canceled) {
@@ -42,7 +46,9 @@ async function addEvents(interaction, linkArr = undefined) {
                         if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
                             startedLinks.push(linkArr[i])
                             eventStarted = true;
-                            continue;
+                            if (pageInfo.scheduledEndTime.getTime() < currentDate.getTime()) {
+                                eventEnded = true
+                            }
                         }
 
                         if (pageInfo.levels) {
@@ -73,6 +79,13 @@ async function addEvents(interaction, linkArr = undefined) {
                         if (pageInfo.canceled) {
                             existingEvent.delete()
                             canceledLinks.push(linkArr[i])
+                        }
+                        else if (eventStarted && !eventEnded) {
+                            await existingEvent.edit({
+                                scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
+                                description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
+                            });
+                            passedLinks.push(linkArr[i]);
                         }
                         else {
                             await existingEvent.edit({
@@ -157,6 +170,9 @@ async function addEvents(interaction, linkArr = undefined) {
                 for (let i = 1; i < startedLinkReply.length; i++) {
                     await interaction.followUp({ content: startedLinkReply[i] })
                 }
+            }
+            if (startedLinks.length != 0) {
+                await interaction.followUp({ content: canceledLinkReply[0], components: [], embeds: [] })
             }
             if (canceledLinkReply[1]) {
                 for (let i = 1; i < canceledLinkReply.length; i++) {
