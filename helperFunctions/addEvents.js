@@ -1,7 +1,7 @@
 const { Scrapper } = require('../scrapper/scrapper.js')
 const { loadingBar } = require('./loadingBar.js');
 
-async function addEvents(interaction, linkArr = undefined) {
+async function addEvents(interaction, linkArr = undefined, canceledEvents = undefined) {
     let numEventsProcessed = 0;
     let progress;
     try {
@@ -11,10 +11,10 @@ async function addEvents(interaction, linkArr = undefined) {
             linkArr = fieldInput.split('\n');
             //progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` });
         }
-       if (linkArr.length != 0) {
-            progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` });
-       }
-
+        if (linkArr.length != 0) {
+                progress = await interaction.followUp({ content: `Number of events processed: ${numEventsProcessed}/${linkArr.length}\n${loadingBar(numEventsProcessed, linkArr.length)}` });
+        }
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
         let passedLinks = []
         let failedLinks = []
         let canceledLinks = []
@@ -24,6 +24,11 @@ async function addEvents(interaction, linkArr = undefined) {
         let eventCollection = await eventManager.fetch();
 
         for (let i = 0; i < linkArr.length; i++) {
+            if (linkArr.length > 5 ) {
+                //reduce rate limiting and make average delay between adds closer
+                await delay(2000);
+            }
+            
             let eventStarted = false;
             let eventEnded = false;
             if (!scrapper.checkValidURL(linkArr[i])) {
@@ -38,6 +43,10 @@ async function addEvents(interaction, linkArr = undefined) {
                 else {
                     let lvlsStr = ''
                     let resultStr = ''
+                    if (canceledEvents && canceledEvents.length !== 0 &&
+                         canceledEvents.includes(linkArr[i])) {
+                        pageInfo.canceled = true
+                    }
                     if (!pageInfo.canceled) {
                         const currentDate = new Date;
                         if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
@@ -183,9 +192,6 @@ async function addEvents(interaction, linkArr = undefined) {
                 }
                 failedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
-        }
-        else if (canceledLinks != 0) {
-            // TODO: Add removal of canceled events.
         }
         else await interaction.followUp({ content: 'None of the provided links were valid' })
     } catch (error) {

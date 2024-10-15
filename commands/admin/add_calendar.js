@@ -144,8 +144,8 @@ async function awaitSelection(response, interactionUserID, calendarSelection = u
             case "submit":
                 await confirmation.deferReply()
                 const scrapper = new Scrapper(eventNum, getCalendarURL(calendarSelection));
-                let eventLinksArr = await scrapper.scrapCalendar()
-                await addEvents(confirmation, eventLinksArr)
+                const [eventLinksArr, canceledEvents] = await scrapper.scrapCalendar()
+                await addEvents(confirmation, eventLinksArr, canceledEvents)
                 submitted = true;
                 break;
             default:

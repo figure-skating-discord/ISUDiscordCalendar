@@ -13,8 +13,8 @@ class Scrapper {
         //console.log("calendar URL in scrap calendar", this.calendarURL)
         const pageHtml = await this.#getCalendarHTML(this.calendarURL);
         if (pageHtml !== 'invalid link') {
-            const eventLinkArr = await this.#generateEventLinkArr(pageHtml);
-            return eventLinkArr;
+            const [eventLinkArr, canceledEvents] = await this.#generateEventLinkArr(pageHtml);
+            return [eventLinkArr, canceledEvents];
         }
         return undefined;
     }
@@ -111,8 +111,9 @@ class Scrapper {
 
         let table = document.querySelector('table > tbody')
         let canceled = false
-        const cancelElement = Array.from(document.querySelectorAll('div.item p')).find(el => 
-            el.textContent.includes('CANCELLED')
+        const cancelElement = Array.from(document.querySelectorAll('div.item p')).find((el) => {
+            return el.textContent.includes('CANCELLED') || el.textContent.includes('CANCELED')
+        }
         );
         if (cancelElement && cancelElement.textContent.includes('CANCELLED')) {
             canceled = true
@@ -140,13 +141,21 @@ class Scrapper {
         const document = dom.window.document
 
         let linkArr = [];
+        let canceledArr = []
 
         const aNodes = document.querySelectorAll('.event_details > a')
-
         aNodes.forEach((link) => {
-            if (link.href) linkArr.push(link.href);
+            if (link.href) {
+                linkArr.push(link.href)
+                const cancelledElement = link.querySelector('.eventCancelled')
+                if (cancelledElement && /cancelled|canceled/i.test(cancelledElement.textContent)) {
+                    canceledArr.push(link.href);
+                    //console.log(`Event "${link.title}" is canceled)`)
+                }
+                
+            } 
         })
-        return linkArr;
+        return [linkArr, canceledArr];
     }
 
     
