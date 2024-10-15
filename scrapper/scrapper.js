@@ -111,7 +111,9 @@ class Scrapper {
 
         let table = document.querySelector('table > tbody')
         let canceled = false
-        const cancelElement = document.querySelector('.item.table-responsive span[style*="color: #ff0000;"]');
+        const cancelElement = Array.from(document.querySelectorAll('div.item p')).find(el => 
+            el.textContent.includes('CANCELLED')
+        );
         if (cancelElement && cancelElement.textContent.includes('CANCELLED')) {
             canceled = true
         }
