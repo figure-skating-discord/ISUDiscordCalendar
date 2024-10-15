@@ -18,7 +18,7 @@ async function addEvents(interaction, linkArr = undefined) {
         let passedLinks = []
         let failedLinks = []
         let canceledLinks = []
-        let startedLinks = []
+        let endedLinks = []
 
         const eventManager = interaction.guild.scheduledEvents
         let eventCollection = await eventManager.fetch();
@@ -36,17 +36,14 @@ async function addEvents(interaction, linkArr = undefined) {
                     continue;
                 }
                 else {
-                    //DEV Line
-                    pageInfo.scheduledStartTime = new Date("2024-10-09T14:00:00.000Z")
-                    console.log(pageInfo.scheduledStartTime)
                     let lvlsStr = ''
                     let resultStr = ''
                     if (!pageInfo.canceled) {
                         const currentDate = new Date;
                         if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
-                            startedLinks.push(linkArr[i])
                             eventStarted = true;
                             if (pageInfo.scheduledEndTime.getTime() < currentDate.getTime()) {
+                                endedLinks.push(linkArr[i])
                                 eventEnded = true
                             }
                         }
@@ -114,7 +111,7 @@ async function addEvents(interaction, linkArr = undefined) {
         if (passedLinks.length != 0) {
             let reply = ['**The following events were accepted:**']
             let failedLinkReply = ['**Failed to retrieve the following links:**']
-            let startedLinkReply = ['**The Following events have already started**']
+            let endedLinkReply = ['**The following events have already ended**']
             let canceledLinkReply = ['**The following events have been canceled:**']
             for (let i = 0; i < passedLinks.length; i++) {
                 if (reply.findLast(e => e == e).length + passedLinks[i].length >= 2000) reply.push(passedLinks[i]);
@@ -133,12 +130,12 @@ async function addEvents(interaction, linkArr = undefined) {
                 }
                 failedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
-            if (startedLinks.length != 0) {
-                for (let i = 0; i < startedLinks.length; i++) {
-                    if (startedLinkReply.findLast(e => e == e).length + startedLinks[i].length >= 2000) reply.push(startedLinks[i]);
-                    else startedLinkReply[startedLinkReply.length-1] += `\n${startedLinks[i]}`
+            if (endedLinks.length != 0) {
+                for (let i = 0; i < endedLinks.length; i++) {
+                    if (endedLinkReply.findLast(e => e == e).length + endedLinks[i].length >= 2000) reply.push(endedLinks[i]);
+                    else endedLinkReply[endedLinkReply.length-1] += `\n${endedLinks[i]}`
                 }
-                startedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
+                endedLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
             if (canceledLinks.length != 0) {
                 for (let i = 0; i < canceledLinks.length; i++) {
@@ -148,30 +145,30 @@ async function addEvents(interaction, linkArr = undefined) {
                 canceledLinkReply.forEach(async msg => await interaction.followUp({ content: msg }));
             }
         }
-        else if (startedLinks.length != 0 || canceledLinks.length != 0) {
+        else if (endedLinks.length != 0 || canceledLinks.length != 0) {
             let failedLinkReply = ['**Failed to retrieve the following links:**']
-            let startedLinkReply = ['**The following events have already started:**']
+            let endedLinkReply = ['**The following events have already ended:**']
             let canceledLinkReply = ['**The following events have been canceled:**']
-            for (let i = 0; i < startedLinks.length; i++) {
-                if (startedLinkReply.findLast(e => e == e).length + startedLinks[i].length >= 2000) reply.push(startedLinks[i]);
-                else startedLinkReply[startedLinkReply.length-1] += `\n${startedLinks[i]}`
+            for (let i = 0; i < endedLinks.length; i++) {
+                if (endedLinkReply.findLast(e => e == e).length + endedLinks[i].length >= 2000) reply.push(endedLinks[i]);
+                else endedLinkReply[endedLinkReply.length-1] += `\n${endedLinks[i]}`
             }
             for (let i = 0; i < canceledLinks.length; i++) {
                 if (canceledLinks.findLast(e => e == e).length + canceledLinks[i].length >= 2000) reply.push(canceledLinks[i]);
                 else canceledLinkReply[canceledLinkReply.length-1] += `\n${canceledLinks[i]}`
             }
-            if (startedLinks.length != 0) {
-                await interaction.editReply({ content: startedLinkReply[0], components: [], embeds: [] })
+            if (endedLinks.length != 0) {
+                await interaction.editReply({ content: endedLinkReply[0], components: [], embeds: [] })
             }
             else if (canceledLinks.length != 0) {
                 await interaction.editReply({ content: canceledLinkReply[0], components: [], embeds: [] })
             }
-            if (startedLinkReply[1]) {
-                for (let i = 1; i < startedLinkReply.length; i++) {
-                    await interaction.followUp({ content: startedLinkReply[i] })
+            if (endedLinkReply[1]) {
+                for (let i = 1; i < endedLinkReply.length; i++) {
+                    await interaction.followUp({ content: endedLinkReply[i] })
                 }
             }
-            if (startedLinks.length != 0) {
+            if (endedLinks.length != 0) {
                 await interaction.followUp({ content: canceledLinkReply[0], components: [], embeds: [] })
             }
             if (canceledLinkReply[1]) {
