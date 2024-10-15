@@ -1,7 +1,7 @@
 const { Scrapper } = require('../scrapper/scrapper.js')
 const { loadingBar } = require('./loadingBar.js');
 
-async function autoAddEvents(guild, linkArr = undefined) {
+async function autoAddEvents(guild, linkArr = undefined, canceledEvents = undefined) {
     try {
 
         const scrapper = new Scrapper
@@ -11,8 +11,9 @@ async function autoAddEvents(guild, linkArr = undefined) {
 
         for (let i = 0; i < linkArr.length; i++) {
             let eventStarted = false;
+            let eventEnded = false;
             if (!scrapper.checkValidURL(linkArr[i])) {
-                failedLinks.push(linkArr[i])
+                continue;
             }
             else {
                 let pageInfo = await scrapper.scrapeSingleEvent(linkArr[i])
@@ -20,44 +21,56 @@ async function autoAddEvents(guild, linkArr = undefined) {
                     continue;
                 }
                 else {
-                    const currentDate = new Date;
-                    if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
-                        eventStarted = true;
-                        continue;
-                    }
-
                     let lvlsStr = ''
+                    let resultStr = ''
+                    if (canceledEvents && canceledEvents.length !== 0 &&
+                         canceledEvents.includes(linkArr[i])) {
+                        pageInfo.canceled = true
+                    }
+                    if (!pageInfo.canceled) {
+                        const currentDate = new Date;
+                        if (pageInfo.scheduledStartTime.getTime() < currentDate.getTime()) {
+                            eventStarted = true;
+                            if (pageInfo.scheduledEndTime.getTime() < currentDate.getTime()) {
+                                eventEnded = true
+                            }
+                        }
 
-                         if (pageInfo.levels) {
+                        if (pageInfo.levels) {
                             lvlsStr = '\n\n**__Disciplines and Levels__:**'
                             let lvls = pageInfo.levels
                             for(let i = 0; i < pageInfo.levels.length; i++) {
                                 const key = Object.keys(lvls[i])[0]
                                 if(lvls[i][key].levels) lvlsStr += `\n**${key}:** ${lvls[i][key].levels}`;
                             }
-                         }
+                        }
+    
+                        if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
+                    }
 
-                    let resultStr = ''
-
-                    if (pageInfo.results) resultStr = `\n\n**__Results Page__:**\n${pageInfo.results}`
                     let pageURLReg = new RegExp(`.*${pageInfo.link.trim()}.*`)
                     let existingEvent = await eventCollection.find((scheduledEvent) => {
                         return scheduledEvent.description.match(pageURLReg) //&& scheduledEvent.name === pageInfo.name
                     })
                     if (existingEvent && existingEvent.creator.bot) {
-                        /*The following checks if anything is different before making a api request
-                         Image from page info will always be different in this case though :\ 
-                        let editArgObj = {}
-                         if (existingEvent.scheduledStartTime.getTime() !== infoPage.scheduledStartTime.getTime()) editArgObj[scheduledStartTime] = pageInfo.scheduledStartTime
-                         if (existingEvent.scheduledEndTime.getTime() !== infoPage.scheduledEndTime.getTime()) editArgObj[scheduledEndTime] = pageInfo.scheduledEndTime
-                         if (existingEvent.entityMetadata.location !== pageInfo.location) editArgObj[entityMetadata] = { location: pageInfo.location }
-                         if (existingEvent.image) */
 
-                        await existingEvent.edit({
-                            scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
-                            description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
-                        });
+                        if (pageInfo.canceled) {
+                            existingEvent.delete()
+                        }
+                        else if (eventStarted && !eventEnded) {
+                            await existingEvent.edit({
+                                scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
+                                description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
+                            });
+                        }
+                        else {
+                            await existingEvent.edit({
+                                scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
+                                description: `**CLICK EVENT FOR MORE INFO!**${lvlsStr}${resultStr}\n\n__**ISU Competition Page:**__\n${pageInfo.link}`, entityMetadata: { location: pageInfo.location }, image: pageInfo.coverImgB64
+                            });
+                        }
                     }
+                    else if (pageInfo.canceled) canceledLinks.push(linkArr[i])
                     else if (!eventStarted) {
                         await guild.scheduledEvents.create({
                             name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
