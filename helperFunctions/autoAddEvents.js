@@ -70,7 +70,6 @@ async function autoAddEvents(guild, linkArr = undefined, canceledEvents = undefi
                             });
                         }
                     }
-                    else if (pageInfo.canceled) canceledLinks.push(linkArr[i])
                     else if (!eventStarted) {
                         await guild.scheduledEvents.create({
                             name: pageInfo.name, scheduledStartTime: pageInfo.scheduledStartTime.toUTCString(), scheduledEndTime: pageInfo.scheduledEndTime.toUTCString(),
