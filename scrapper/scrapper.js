@@ -16,7 +16,7 @@ class Scrapper {
             const [eventLinkArr, canceledEvents] = await this.#generateEventLinkArr(pageHtml);
             return [eventLinkArr, canceledEvents];
         }
-        return undefined;
+        return [undefined, undefined];
     }
 
     async #getCalendarHTML(calendarURl) {
@@ -34,7 +34,7 @@ class Scrapper {
             });
             //console.log("response:", response)
             if (!response.ok) {
-                //console.log('res from res!ok', response)
+                console.log('res from res!ok', response)
                 //console.log('res not ok')
                 throw new Error('invalid request URL')
             }
