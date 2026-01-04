@@ -1,9 +1,10 @@
+const { Events } = require('discord.js');
 const { getFiles } = require('../helperFunctions/getFiles.js')
 const { startInterval } = require('../helperFunctions/addEventsInterval.js')
 const  fs  = require('fs');
 
 module.exports = {
-    name: 'ready',
+    name: Events.ClientReady,
     once: true,
     async execute(client) {
         console.log(`logged in as ${client.user.tag}`);

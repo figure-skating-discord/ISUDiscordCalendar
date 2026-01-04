@@ -16,7 +16,7 @@ const startInterval = async (guild, calLimit, calUrl, calId, i = 1 * 60 * 60 * 1
     let intervalRef = setInterval(async () => {
         //console.log(calUrl)
         const scrapper = new Scrapper(calLimit, calUrl);
-        const [eventLinksArr, canceledEvents] = await scrapper.scrapCalendar(calUrl)
+        const [eventLinksArr, canceledEvents] = await scrapper.scrapCalendar({ upcomingOnly: true })
         await autoAddEvents(guild, eventLinksArr, canceledEvents)
     }, i)
     if (intervals[guild.id]) {

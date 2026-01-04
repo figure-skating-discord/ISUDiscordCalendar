@@ -2,6 +2,7 @@ const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder
 
 const { Scrapper } = require('../../scrapper/scrapper.js')
 const { stopInterval, startInterval, intervals } = require('../../helperFunctions/addEventsInterval.js')
+const { autoAddEvents } = require('../../helperFunctions/autoAddEvents.js')
 const { getFiles } = require('../../helperFunctions/getFiles.js')
 const fs = require('node:fs')
 const { join } = require('path')
@@ -17,16 +18,16 @@ module.exports = {
         //these are not all the embed options see the api doc
         const embed = new EmbedBuilder()
             .setTitle('Calendar Select')
-            .setURL('https://www.isu.org/events')
+            .setURL('https://isu-skating.com/')
             //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_2018.png')
             //.setThumbnail('https://cdn2.isu.org/templates/isu/images/logo_footer.png')
             .setThumbnail('https://imgur.com/pnNlUrG.png')
-            .setDescription(`Click the button for the ISU calendar you\'d like to add the events from **OR** disable auto events for. Then specify how many events you\'d like to add with the drop down. __**A server cannot have over 100 scheduled events.**__`)
+            .setDescription(`Select one or more ISU calendars to enable or disable auto events for. Then specify how many events you\'d like to add for each selected discipline. __**A server cannot have over 100 scheduled events.**__`)
             .addFields(
-                { name: '⛸️ Figure Skating', value: 'https://www.isu.org/figure-skating/events/figure-skating-calendar' },
-                { name: '🧑‍🤝‍🧑 Synchro', value: 'https://www.isu.org/synchronized-skating/events/synchronized-skating-calendar' },
-                { name: '🐇 Speed Skating', value: 'https://www.isu.org/speed-skating/events/speed-skating-calendar' },
-                { name: '🦵 Short Track', value: 'https://www.isu.org/short-track/events/short-track-calendar' },
+                { name: '⛸️ Figure Skating', value: 'https://isu-skating.com/figure-skating/events/' },
+                { name: '🧑‍🤝‍🧑 Synchro', value: 'https://isu-skating.com/synchronized-skating/events/' },
+                { name: '🐇 Speed Skating', value: 'https://isu-skating.com/speed-skating/events/' },
+                { name: '🦵 Short Track', value: 'https://isu-skating.com/short-track/events/' },
                 //{ name: '📚 Development - Figure Skating', value: 'Some value here'},
                 //{ name: '😤 [All]()', value: 'Some value here'},
                 {
@@ -37,30 +38,22 @@ module.exports = {
             )
             .setColor(0x454894);
 
-        //Calendar Select Row
+        const calendarOptions = [
+            { label: 'Figure Skating', value: 'FigureSkating' },
+            { label: 'Synchro', value: 'Synchro' },
+            { label: 'Speed Skating', value: 'SpeedSkating' },
+            { label: 'Short Track', value: 'ShortTrack' }
+        ];
 
-        const figureSkating = new ButtonBuilder()
-            .setCustomId('FigureSkating')
-            .setLabel('⛸️Figure Skating⛸️')
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(false);
-
-        const synchroSkating = new ButtonBuilder()
-            .setCustomId('Synchro')
-            .setLabel('🧑‍🤝‍🧑Synchro🧑‍🤝‍🧑')
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(false);
-
-        const speedSkating = new ButtonBuilder()
-            .setCustomId('SpeedSkating')
-            .setLabel('🐇Speed Skating🐇')
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(false);
-
-        const shortTrack = new ButtonBuilder()
-            .setCustomId('ShortTrack')
-            .setLabel('🦵Short Track🦵')
-            .setStyle(ButtonStyle.Secondary)
+        const calendarSelect = new StringSelectMenuBuilder()
+            .setCustomId('calendarSelect')
+            .setPlaceholder('Select discipline(s)')
+            .setMinValues(1)
+            .setMaxValues(calendarOptions.length)
+            .addOptions(
+                ...calendarOptions.map(option => new StringSelectMenuOptionBuilder()
+                    .setLabel(option.label)
+                    .setValue(option.value)))
             .setDisabled(false);
 
         //Action Select Row
@@ -124,8 +117,8 @@ module.exports = {
         const menuRow = new ActionRowBuilder()
             .addComponents(select);
 
-        const buttonRow = new ActionRowBuilder()
-            .addComponents(figureSkating, synchroSkating, speedSkating, shortTrack);
+        const calendarRow = new ActionRowBuilder()
+            .addComponents(calendarSelect);
 
         const intervalRow = new ActionRowBuilder()
             .addComponents(oneHr, sixHrs, twelveHrs, oneDay);
@@ -137,9 +130,7 @@ module.exports = {
             content: '',
             //10 embed per reply limit
             embeds: [embed],
-            //ephemeral makes it so only command user sees reply
-            ephemeral: false,
-            components: [buttonRow, menuRow, intervalRow, actionRow]
+            components: [calendarRow, menuRow, intervalRow, actionRow]
         });
 
 
@@ -148,7 +139,7 @@ module.exports = {
 }
 
 
-async function awaitSelection(response, interactionUserID, calendarSelection = '', eventNum = '', interval = '') {
+async function awaitSelection(response, interactionUserID, calendarSelection = [], eventNum = '', interval = '') {
     let submitted = false;
     let canceled = false;
     let disabled = false;
@@ -156,11 +147,23 @@ async function awaitSelection(response, interactionUserID, calendarSelection = '
     try {
         const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 600_000 });
         let comps = confirmation.message.components
-        let calRow = comps[0].components
+        let calendarMenuData = comps[0].components[0].data
         let menuData = comps[1].components[0].data
         let intervalRow = comps[2].components
         let submitBtn = comps[3].components[0].data
         let disableBtn = comps[3].components[1].data
+        const hasCalendars = () => calendarSelection && calendarSelection.length > 0;
+        const updateCalendarMenuDisplay = () => {
+            calendarMenuData.placeholder = formatCalendarSelection(calendarSelection, 'Select discipline(s)');
+            if (calendarMenuData.options) {
+                calendarMenuData.options.forEach(option => {
+                    option.default = calendarSelection.includes(option.value);
+                });
+            }
+        };
+        const updateSubmitState = () => {
+            submitBtn.disabled = !(hasCalendars() && eventNum && interval);
+        };
         //console.log('confirmation:', confirmation)
         switch (confirmation.customId) {
             //enables selecting a calendar after the user has made an event quanitity selection
@@ -168,18 +171,15 @@ async function awaitSelection(response, interactionUserID, calendarSelection = '
                 eventNum = Number(confirmation.values[0]);
                 menuData.placeholder = `${eventNum}`
                 intervalRow.forEach(btn => btn.data.disabled = false)
+                updateSubmitState();
                 await confirmation.update({ components: comps });
                 break;
-            case "FigureSkating":
-            case "Synchro":
-            case "SpeedSkating":
-            case "ShortTrack":
-                calendarSelection = confirmation.customId
-                let calBtn = calRow.find(btn => btn.data.custom_id === confirmation.customId)
-                calRow.forEach(btn => btn.data.style = 2);
-                calBtn.data.style = 1;
-                menuData.disabled = false;
-                disableBtn.disabled = false;
+            case "calendarSelect":
+                calendarSelection = confirmation.values || []
+                menuData.disabled = calendarSelection.length == 0;
+                disableBtn.disabled = calendarSelection.length == 0;
+                updateCalendarMenuDisplay();
+                updateSubmitState();
                 await confirmation.update({ components: comps });
                 break;
             case "oneHr":
@@ -204,7 +204,7 @@ async function awaitSelection(response, interactionUserID, calendarSelection = '
                 let intervalBtn = intervalRow.find(btn => btn.data.custom_id === confirmation.customId)
                 intervalRow.forEach(btn => btn.data.style = 2);
                 intervalBtn.data.style = 1;
-                submitBtn.disabled = false;
+                updateSubmitState();
                 await confirmation.update({ components: comps });
                 break;
             case "cancel":
@@ -212,14 +212,36 @@ async function awaitSelection(response, interactionUserID, calendarSelection = '
                 await confirmation.update({ content: '**Command Canceled!**', components: [], embeds: [] });
                 break;
             case "submit":
-                await confirmation.reply(`__**${calendarSelection.match(/[A-Z][a-z]+|[0-9]+/g).join(" ")} Auto Event Updating Enabled!**__\n**Update Interval:** \`${interval} Hour(s)\`\n**Number of Events:** \`${eventNum}\``)
-                await toggleUpdateInverval(confirmation.guild, eventNum, getCalendarURL(calendarSelection), calendarSelection, true, interval, eventNum)
+                await confirmation.reply(`__**${formatCalendarSelection(calendarSelection)} Auto Event Updating Enabled!**__
+**Update Interval:** \`${interval} Hour(s)\`
+**Number of Events:** \`${eventNum}\``)
+                for (const selection of calendarSelection) {
+                    const calendarUrl = getCalendarURL(selection);
+                    if (!calendarUrl) {
+                        continue;
+                    }
+                    try {
+                        const scrapper = new Scrapper(eventNum, calendarUrl);
+                        const [eventLinksArr, canceledEvents] = await scrapper.scrapCalendar({ upcomingOnly: true })
+                        await autoAddEvents(confirmation.guild, eventLinksArr, canceledEvents)
+                    }
+                    catch (e) {
+                        console.log(e)
+                    }
+                    await toggleUpdateInverval(confirmation.guild, eventNum, calendarUrl, selection, true, interval, eventNum)
+                }
                 submitted = true;
                 break;
             case 'disable':
                 disabled = true;
-                await toggleUpdateInverval(confirmation.guild, eventNum, getCalendarURL(calendarSelection), calendarSelection, false, interval, eventNum)
-                await confirmation.update({ content: `**${calendarSelection.match(/[A-Z][a-z]+|[0-9]+/g).join(" ")} Auto Events Disabled!**`, components: [], embeds: [] });
+                for (const selection of calendarSelection) {
+                    const calendarUrl = getCalendarURL(selection);
+                    if (!calendarUrl) {
+                        continue;
+                    }
+                    await toggleUpdateInverval(confirmation.guild, eventNum, calendarUrl, selection, false, interval, eventNum)
+                }
+                await confirmation.update({ content: `**${formatCalendarSelection(calendarSelection)} Auto Events Disabled!**`, components: [], embeds: [] });
                 break;
             default:
                 console.log('default switch response')
@@ -236,29 +258,41 @@ async function awaitSelection(response, interactionUserID, calendarSelection = '
     //else console.log('calendar:', calendarSelection, 'event quantity:', eventNum, 'interval:', interval);
 }
 
-function getCalendarURL(customIDSelection) {
-    switch (customIDSelection) {
-        case 'FigureSkating':
-            //console.log('figureSkating')
-            return 'https://www.isu.org/figure-skating/events/figure-skating-calendar';
-            break;
-        case 'Synchro':
-            //console.log('synchro')
-            return 'https://www.isu.org/synchronized-skating/events/synchronized-skating-calendar';
-            break;
-        case 'SpeedSkating':
-            //console.log('speedSkating')
-            return 'https://www.isu.org/speed-skating/events/speed-skating-calendar';
-            break;
-        case 'ShortTrack':
-            //console.log('shortTrack')
-            return 'https://www.isu.org/short-track/events/short-track-calendar';
-            break;
-        default:
-            console.log('calendar pref undef:', customIDSelection)
-            return undefined;
-            break;
+function normalizeCalendarKey(value) {
+    return value ? value.toLowerCase() : '';
+}
+
+function formatCalendarSelection(selections, emptyValue) {
+    if (!selections || selections.length === 0) {
+        return emptyValue || 'No Calendars Selected';
     }
+    const labels = {
+        figureskating: 'Figure Skating',
+        synchro: 'Synchro',
+        speedskating: 'Speed Skating',
+        shorttrack: 'Short Track'
+    };
+    return selections
+        .map(selection => labels[normalizeCalendarKey(selection)] || selection)
+        .join(', ');
+}
+
+function getCalendarURL(customIDSelection) {
+    if (!customIDSelection) {
+        return undefined;
+    }
+    const normalized = normalizeCalendarKey(customIDSelection);
+    const calendarUrls = {
+        figureskating: 'https://isu-skating.com/figure-skating/events/',
+        synchro: 'https://isu-skating.com/synchronized-skating/events/',
+        speedskating: 'https://isu-skating.com/speed-skating/events/',
+        shorttrack: 'https://isu-skating.com/short-track/events/'
+    };
+    if (!calendarUrls[normalized]) {
+        console.log('calendar pref undef:', customIDSelection)
+        return undefined;
+    }
+    return calendarUrls[normalized];
 }
 
 async function toggleUpdateInverval(guild, calLimit, calUrl, calId, toggle = false, interval = 0, eventNum) {

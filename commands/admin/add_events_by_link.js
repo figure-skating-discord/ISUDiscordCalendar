@@ -18,7 +18,7 @@ module.exports = {
         const linkInput = new TextInputBuilder()
             .setCustomId('linkInput')
             .setLabel("Input competition link(s)")
-            .setPlaceholder(`isu.org pages ONLY, separate links with a new line.`)
+            .setPlaceholder(`isu-skating.com pages only, separate links with a new line.`)
             // Paragraph means multiple lines of text.
             .setStyle(TextInputStyle.Paragraph)
             // require a value in this input field
